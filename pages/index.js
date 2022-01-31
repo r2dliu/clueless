@@ -1,6 +1,7 @@
 import React from "react";
 import { Client } from "boardgame.io/react";
 import { TicTacToe } from "components/game";
+import { SocketIO } from "boardgame.io/multiplayer";
 import Board from "components/board";
 import Head from "next/head";
 
@@ -8,7 +9,8 @@ export default function Home() {
 
   const App = Client({
     game: TicTacToe,
-    board: Board
+    board: Board,
+    multiplayer: SocketIO({ server: "localhost:8000" }),
   });
 
   return (
