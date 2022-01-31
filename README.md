@@ -6,3 +6,6 @@ open up `localhost:8000`. alter files in `pages/index.js` to start developing!
 you can open up the same link in multiple tabs or different windows and note that they are automatically synced up!
 
 server and client both share the game.js
+
+current node version: 8.3.0
+current npm version: v16.13.1
