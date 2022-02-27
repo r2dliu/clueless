@@ -1,0 +1,24 @@
+
+from fastapi import WebSocket
+
+
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: dict[str, WebSocket] = {}
+
+    def has_existing_connection(self, uuid):
+        return True if uuid in self.active_connections else False
+
+    async def connect(self, uuid: str, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections[uuid] = websocket
+
+    def disconnect(self, uuid: str):
+        self.active_connections.pop(uuid)
+
+    async def send_personal_message(self, message: str, websocket: WebSocket):
+        await websocket.send_text(message)
+
+    async def broadcast(self, message: str):
+        for connection in self.active_connections:
+            await connection.send_text(message)
