@@ -3,3 +3,4 @@ uvicorn>=0.17.4
 flake8
 toml
 autopep8
+uuid

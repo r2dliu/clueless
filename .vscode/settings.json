@@ -3,7 +3,7 @@
   "python.analysis.extraPaths": ["${workspaceFolder}/api"],
   "python.linting.flake8Enabled": true,
   "python.linting.enabled": true,
-  "python.formatting.provider": "autopep8",
+  "python.formatting.provider": "yapf",
   "editor.formatOnSave": true,
   "eslint.format.enable": true,
   "editor.codeActionsOnSave": {

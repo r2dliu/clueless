@@ -1,8 +1,8 @@
-
 from fastapi import WebSocket
 
 
 class ConnectionManager:
+
     def __init__(self):
         self.active_connections: dict[str, WebSocket] = {}
 
@@ -20,5 +20,5 @@ class ConnectionManager:
         await websocket.send_text(message)
 
     async def broadcast(self, message: str):
-        for connection in self.active_connections:
+        for connection in self.active_connections.values():
             await connection.send_text(message)
