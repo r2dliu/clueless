@@ -1,0 +1,28 @@
+.Board {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+
+  .buttons {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .newGame {
+      margin-bottom: 20px;
+    }
+
+    .joinGame {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .textField {
+        padding-right: 20px;
+      }
+    }
+  }
+}
