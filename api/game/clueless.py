@@ -44,16 +44,23 @@ class Clueless:
         }
         # starting locations
         state['suspect_locations'] = {
-            'colonel_mustard': ' lounge_dining',
             'miss_scarlet': 'hall_lounge',
             'professor_plum': 'library_study',
             'mr_green': 'ballroom_conservatory',
             'mrs_white': 'kitchen_ballroom',
             'mrs_peacock': 'conservatory_library',
+            'colonel_mustard': ' lounge_dining',
         }
         # randomly generated case file cards
+        state['concealed_scenario'] = self.create_scenario()
 
         # player cards (call distribute_cards())
+        state['player_cards'] = self.distribute_cards()
+
+        # start turn order with miss scarlet
+        state['turn_order'] = self.generate_turn_order()
+
+        # todo: visible_cards, current_turn, suggestion
 
         return state
 
@@ -62,15 +69,22 @@ class Clueless:
 
     def create_scenario(self):
         # picks a random weapon, suspect, room to store in case envelope
-        pass
+        return 'case file'
 
     def distribute_cards(self):
         # randomly distribute cards
-        pass
+        return 'cards distributed'
 
     def generate_turn_order(self):
-        # randomly picks player move order
-        pass
+        # randomly picks player move order (todo)
+        return [
+            'miss_scarlet',
+            'professor_plum',
+            'mr_green',
+            'mrs_white',
+            'mrs_peacock',
+            'colonel_mustard',
+        ]
 
     def get_next_player(self, current_player):
         # returns next player to move
