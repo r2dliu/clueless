@@ -51,8 +51,14 @@ class Clueless:
             'mrs_white': 'kitchen_ballroom',
             'mrs_peacock': 'conservatory_library',
         }
+        # randomly generated case file cards
+
+        # player cards (call distribute_cards())
 
         return state
+
+    def get_game_state(self):
+        return self.state
 
     def create_scenario(self):
         # picks a random weapon, suspect, room to store in case envelope
