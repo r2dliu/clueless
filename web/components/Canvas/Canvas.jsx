@@ -1,9 +1,8 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
-import TextField from "@mui/material/TextField";
 import Board from "./Board";
-import MainMenu from "./MainMenu";
 
 import styles from "./Canvas.module.scss";
+import Menu from "./Menu/Menu";
 
 function Canvas() {
   const textFieldRef = useRef();
@@ -14,10 +13,12 @@ function Canvas() {
   return (
     <div className={styles.Canvas}>
       <div className={styles.box}>
-        {!gameId && <MainMenu setGameId={setGameId} />}
+        {!gameId && <Menu setGameId={setGameId} />}
         {gameId && <Board gameId={gameId} />}
       </div>
-      <div className={styles.sidebar}>sidebar</div>
+      {/* todo: Treat the game board as a seperate view and move the sidebar to the game board 
+          <div className={styles.sidebar}>sidebar</div> 
+      */}
     </div>
   );
 }
