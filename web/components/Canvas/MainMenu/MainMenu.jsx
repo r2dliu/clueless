@@ -40,15 +40,17 @@ function MainMenu({ setGameId, setClientId }) {
   };
 
   const joinGame = () => {
-    let hasError = false;
+    const errors = {};
     if (!clientIdInput) {
-      setErrors({ ...errors, nameInput: invalidClientIdMessage });
-      hasError = true;
+      errors.nameInput = invalidClientIdMessage;
     }
     // todo validate the game id is for a current game
     if (!gameIdInput) {
-      setErrors({ ...errors, gameIdInput: invalidGameIdMessage });
-      hasError = true;
+      errors.gameIdInput = invalidGameIdMessage;
+    }
+    if (errors.clientIdInput || errors.gameIdInput) {
+      setErrors(errors);
+      return;
     }
 
     // todo connect client
