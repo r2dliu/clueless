@@ -14,7 +14,7 @@ function Canvas() {
 
   return (
     <div className={cn(styles.Canvas, { [styles.inGame]: !!gameId })}>
-      <div className={styles.box}>
+      <div className={styles.container}>
         {!gameId && <MainMenu />}
         {gameId && (
           <>

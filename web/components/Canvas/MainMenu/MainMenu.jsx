@@ -109,7 +109,7 @@ function MainMenu() {
     <Card className={styles.MainMenu}>
       <CardContent>
         <Typography className={styles.menuTitle}>
-          Welcome to Clueless
+          Welcome to Clueless!
         </Typography>
         <Container className={styles.userId}>
           <TextField
@@ -134,9 +134,11 @@ function MainMenu() {
             label="Game ID"
             variant="standard"
           />
-          <Button variant="contained" onClick={joinGame}>
-            Join Game
-          </Button>
+          <div className={styles.button}>
+            <Button variant="contained" onClick={joinGame}>
+              Join Game
+            </Button>
+          </div>
           {/* todo show error if unable to join */}
         </Container>
       </CardContent>
