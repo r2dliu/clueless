@@ -1,4 +1,5 @@
 import React, { useContext } from "react";
+import { GameContext } from "@/components/helpers/GameContext";
 import styles from "./Board.module.scss";
 
 function Board() {

@@ -1,9 +1,9 @@
-.Board {
-  background-color: whitesmoke;
+.Sidebar {
   display: flex;
+  background-color: lightgrey;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   height: min(100vw - 300px, 100vh);
-  width: min(100vw - 300px, 100vh);
+  width: 300px;
 }
