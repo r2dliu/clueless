@@ -2,26 +2,27 @@
   display: flex;
   justify-content: center;
   margin-top: 50%;
-  min-width: 700px;
-  min-height: 500px;
+  width: 700px;
+  height: 450px;
 
-  .lineBreak {
-    width: 90%;
+  .menuContent {
+    align-items: center;
+    padding-top: 10px;
   }
 
   .menuTitle {
-    margin-top: 10%;
-    margin-bottom: 3%;
+    margin-top: 30px;
+    margin-bottom: 5px;
     font-size: 36px;
     font-weight: bold;
   }
 
   .createGame {
-    margin-top: 10%;
-    margin-bottom: 10%;
+    margin-top: 20px;
+    margin-bottom: 20px;
   }
 
   .joinGame {
-    margin-top: 10%;
+    margin-top: 20px;
   }
 }

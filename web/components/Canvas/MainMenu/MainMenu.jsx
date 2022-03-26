@@ -40,27 +40,29 @@ function MainMenu({ setGameId, setClientId }) {
         <Typography className={styles.menuTitle}>
           Welcome to Clueless
         </Typography>
-        <Container className={styles.userId}>
-          <TextField
-            onChange={(e) => setClientIdInput(e.target.value)}
-            label="Display Name"
-            variant="standard"
-            helperText="Please enter your display name."
-            fullWidth
-            required
-          />
-        </Container>
-        <Container className={styles.createGame}>
-          <Button variant="contained" onClick={createNewGame}>
-            Create New Game
-          </Button>
-          {/* todo show error if unable to create new game */}
-        </Container>
-        <div> --- or --- </div>
-        <Container className={styles.joinGame}>
-          <TextField id="standard-basic" label="Game ID" variant="standard" />
-          <Button variant="contained">Join Game</Button>
-          {/* todo show error if unable to join */}
+        <Container className={styles.menuContent}>
+          <Container className={styles.userId}>
+            <TextField
+              onChange={(e) => setClientIdInput(e.target.value)}
+              label="Display Name"
+              variant="standard"
+              helperText="Please enter your display name."
+              fullWidth
+              required
+            />
+          </Container>
+          <Container className={styles.createGame}>
+            <Button variant="contained" onClick={createNewGame}>
+              Create New Game
+            </Button>
+            {/* todo show error if unable to create new game */}
+          </Container>
+          <div className={styles.divider}> --- or --- </div>
+          <Container className={styles.joinGame}>
+            <TextField id="standard-basic" label="Game ID" variant="standard" />
+            <Button variant="contained">Join Game</Button>
+            {/* todo show error if unable to join */}
+          </Container>
         </Container>
       </CardContent>
     </Card>
