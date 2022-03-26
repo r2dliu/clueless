@@ -14,10 +14,20 @@ function MainMenu({ setGameId, setClientId }) {
   const textFieldRef = useRef();
   const [newGameError, setNewGameError] = useState("");
   const [clientIdInput, setClientIdInput] = useState(null);
+  const [gameIdInput, setGameIdInput] = useState(null);
+  const [errors, setErrors] = useState({ nameInput: "", gameIdInput: "" });
+
+  const invalidClientIdMessage = "Enter an display name.";
+  const invalidGameIdMessage = "Enter a valid game ID.";
 
   const createNewGame = async () => {
-    console.log("hello " + clientIdInput);
-    console.log("creating new game");
+    if (!clientIdInput) {
+      setErrors({ nameInput: invalidClientIdMessage });
+      return;
+    }
+
+    console.log(`hello ${clientIdInput}`);
+    console.log("creating new game...");
     const response = await fetch("/new_game");
     if (!response.ok) {
       setNewGameError(response.statusText);
@@ -30,8 +40,33 @@ function MainMenu({ setGameId, setClientId }) {
   };
 
   const joinGame = () => {
+    let hasError = false;
+    if (!clientIdInput) {
+      setErrors({ ...errors, nameInput: invalidClientIdMessage });
+      hasError = true;
+    }
+    // todo validate the game id is for a current game
+    if (!gameIdInput) {
+      setErrors({ ...errors, gameIdInput: invalidGameIdMessage });
+      hasError = true;
+    }
+
     // todo connect client
-    console.log(`todo join game ${textFieldRef.current.value}`);
+    console.log(`todo join game ${gameIdInput}`);
+  };
+
+  const handleGameIdInputChange = (val) => {
+    setErrors({ ...errors, gameIdInput: "" });
+    val
+      ? setGameIdInput(val)
+      : setErrors({ ...errors, gameIdInput: invalidGameIdMessage });
+  };
+
+  const handleNameInputChange = (val) => {
+    setErrors({ ...errors, nameInput: "" });
+    val
+      ? setClientIdInput(val)
+      : setErrors({ ...errors, nameInput: invalidClientIdMessage });
   };
 
   return (
@@ -42,12 +77,13 @@ function MainMenu({ setGameId, setClientId }) {
         </Typography>
         <Container className={styles.menuContent}>
           <TextField
-            onChange={(e) => setClientIdInput(e.target.value)}
+            onChange={(e) => handleNameInputChange(e.target.value)}
             label="Display Name"
             variant="standard"
-            helperText="Please enter your display name."
             fullWidth
             required
+            error={Boolean(errors?.nameInput)}
+            helperText={errors?.nameInput}
           />
           <Container className={styles.createGame}>
             <Button variant="contained" onClick={createNewGame}>
@@ -57,8 +93,16 @@ function MainMenu({ setGameId, setClientId }) {
           </Container>
           <div className={styles.divider}> --- or --- </div>
           <Container className={styles.joinGame}>
-            <TextField id="standard-basic" label="Game ID" variant="standard" />
-            <Button variant="contained">Join Game</Button>
+            <TextField
+              onChange={(e) => handleGameIdInputChange(e.target.value)}
+              label="Game ID"
+              variant="standard"
+              error={Boolean(errors?.gameIdInput)}
+              helperText={errors?.gameIdInput}
+            />
+            <Button variant="contained" onClick={joinGame}>
+              Join Game
+            </Button>
             {/* todo show error if unable to join */}
           </Container>
         </Container>
