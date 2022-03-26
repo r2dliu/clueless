@@ -3,6 +3,7 @@
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from connection_manager import ConnectionManager
 from uuid import UUID, uuid4
+import json
 from game.clueless import Clueless
 
 app = FastAPI()
@@ -28,23 +29,22 @@ async def websocket_connection(websocket: WebSocket, game_uuid: str,
                                client_uuid: str):
     if UUID(game_uuid) in games_by_id:
         if connection_manager.has_existing_connection(client_uuid):
-            raise HTTPException(
-                status_code=409,
-                detail="Websocket client with this UUID already exists")
+            # this username already exists in game, prevent connection
+            await websocket.close(code=409)
+            return
 
         await connection_manager.connect(client_uuid, websocket)
 
         try:
             while True:
-                data = await websocket.receive_text()
-                await connection_manager.send_personal_message(
-                    f"You wrote: {data}", websocket)
-                await connection_manager.broadcast(
-                    f"Client {client_uuid} says: {data}")
+                data = await websocket.receive_json()
+                print("wow got message")
+                print(data)
+                await connection_manager.broadcast(data)
         except WebSocketDisconnect:
             connection_manager.disconnect(client_uuid)
             await connection_manager.broadcast(
-                f"Client {client_uuid} left the chat")
+                json.dumps({"disconnect": client_uuid}))
     else:
-        raise HTTPException(status_code=404,
-                            detail="No game exists for the given uuid")
+        # this game doesn't exist
+        await websocket.close(code=404)
