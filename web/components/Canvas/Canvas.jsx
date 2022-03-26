@@ -1,23 +1,27 @@
-import React, { useState, useCallback, useEffect, useRef } from "react";
+import React, { useContext } from "react";
+import cn from "classnames";
 import Board from "./Board";
+import Sidebar from "./Sidebar";
+import { GameContext } from "@/components/helpers/GameContext";
 
 import styles from "./Canvas.module.scss";
 import MainMenu from "./MainMenu";
 
 function Canvas() {
-  const textFieldRef = useRef();
-  const websocket = useRef(null);
-  const [gameId, setGameId] = useState("");
-  const [clientId, setClientId] = useState("");
-  const [error, setError] = useState("");
+  const { gameIdContext, _clientIdContext, _gameStateContext } =
+    useContext(GameContext);
+  const [gameId, _setGameId] = gameIdContext;
 
   return (
-    <div className={styles.Canvas}>
+    <div className={cn(styles.Canvas, { [styles.inGame]: !!gameId })}>
       <div className={styles.box}>
-        {!gameId && (
-          <MainMenu setGameId={setGameId} setClientId={setClientId} />
+        {!gameId && <MainMenu />}
+        {gameId && (
+          <>
+            <Board />
+            <Sidebar />
+          </>
         )}
-        {gameId && <Board gameId={gameId} />}
       </div>
       {/* todo: Treat the game board as a seperate view and move the sidebar to the game board 
           <div className={styles.sidebar}>sidebar</div> 
