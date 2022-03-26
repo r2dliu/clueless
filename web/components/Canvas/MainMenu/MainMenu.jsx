@@ -26,7 +26,7 @@ function MainMenu() {
   const [newGameError, setNewGameError] = useState("");
   const [clientIdInput, setClientIdInput] = useState(null);
   const [gameIdInput, setGameIdInput] = useState(null);
-  const [errors, setErrors] = useState({ nameInput: "", gameIdInput: "" });
+  const [errors, setErrors] = useState({ clientIdInput: "", gameIdInput: "" });
 
   const invalidClientIdMessage = "Enter an display name.";
   const invalidGameIdMessage = "Enter a valid game ID.";
@@ -34,7 +34,7 @@ function MainMenu() {
   const createNewGame = async () => {
     if (!userNameFieldRef.current.value) {
       console.log("error no username entered. todo display this error");
-      setErrors({ nameInput: invalidClientIdMessage });
+      setErrors({ clientIdInput: invalidClientIdMessage });
       return;
     }
 
@@ -76,7 +76,7 @@ function MainMenu() {
     const errors = {};
     if (!userNameFieldRef.current.value) {
       console.log("error no username entered todo display");
-      errors.nameInput = invalidClientIdMessage;
+      errors.clientIdInput = invalidClientIdMessage;
     }
 
     if (!existingGameFieldRef.current.value) {
@@ -124,11 +124,11 @@ function MainMenu() {
       : setErrors({ ...errors, gameIdInput: invalidGameIdMessage });
   };
 
-  const handleNameInputChange = (val) => {
-    setErrors({ ...errors, nameInput: "" });
+  const handleClientIdInputChange = (val) => {
+    setErrors({ ...errors, clientIdInput: "" });
     val
       ? setClientIdInput(val)
-      : setErrors({ ...errors, nameInput: invalidClientIdMessage });
+      : setErrors({ ...errors, clientIdInput: invalidClientIdMessage });
   };
 
   return (
@@ -144,9 +144,9 @@ function MainMenu() {
             variant="standard"
             fullWidth
             required
-            onChange={(e) => handleNameInputChange(e.target.value)}
-            error={Boolean(errors?.nameInput)}
-            helperText={errors?.nameInput}
+            onChange={(e) => handleClientIdInputChange(e.target.value)}
+            error={Boolean(errors?.clientIdInput)}
+            helperText={errors?.clientIdInput}
           />
         </Container>
         <Container className={styles.createGame}>
