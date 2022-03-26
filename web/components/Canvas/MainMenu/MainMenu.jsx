@@ -41,16 +41,14 @@ function MainMenu({ setGameId, setClientId }) {
           Welcome to Clueless
         </Typography>
         <Container className={styles.menuContent}>
-          <Container className={styles.userId}>
-            <TextField
-              onChange={(e) => setClientIdInput(e.target.value)}
-              label="Display Name"
-              variant="standard"
-              helperText="Please enter your display name."
-              fullWidth
-              required
-            />
-          </Container>
+          <TextField
+            onChange={(e) => setClientIdInput(e.target.value)}
+            label="Display Name"
+            variant="standard"
+            helperText="Please enter your display name."
+            fullWidth
+            required
+          />
           <Container className={styles.createGame}>
             <Button variant="contained" onClick={createNewGame}>
               Create New Game
