@@ -1,3 +1,5 @@
+import json
+
 class Clueless:
     # TODO add game logic
 
@@ -27,6 +29,9 @@ class Clueless:
         # players dict holds client_id: character assignments
         self.players = {}
         self.state = self.initialize_board(self.players)
+    
+    def jsonify(self):
+        return json.dumps(self.state)
 
     def initialize_board(self, players):
         """ Places characters in starting locations, generates sceanario, 
