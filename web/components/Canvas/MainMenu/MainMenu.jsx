@@ -35,7 +35,7 @@ function MainMenu({ setGameId, setClientId }) {
   };
 
   return (
-    <Card className={styles.Menu}>
+    <Card className={styles.MainMenu}>
       <CardContent>
         <Typography className={styles.menuTitle}>
           Welcome to Clueless
