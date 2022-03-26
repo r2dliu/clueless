@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useContext, useRef } from "react";
 import TextField from "@mui/material/TextField";
 import styles from "./MainMenu.module.scss";
 
@@ -10,7 +10,15 @@ import {
   Typography,
 } from "@mui/material";
 
-function MainMenu({ setGameId, setClientId }) {
+import { GameContext } from "@/components/helpers/GameContext";
+
+function MainMenu() {
+  const { gameIdContext, clientIdContext, _gameStateContext } =
+    useContext(GameContext);
+
+  const [gameId, setGameId] = gameIdContext;
+  const [clientId, setClientId] = clientIdContext;
+
   const textFieldRef = useRef();
   const [newGameError, setNewGameError] = useState("");
   const [clientIdInput, setClientIdInput] = useState(null);
@@ -22,9 +30,9 @@ function MainMenu({ setGameId, setClientId }) {
     if (!response.ok) {
       setNewGameError(response.statusText);
     } else {
-      const gameId = await response.json();
-      console.log(gameId);
-      setGameId(gameId);
+      const newGameId = await response.json();
+      console.log(newGameId);
+      setGameId(newGameId);
       setClientId(displayName);
     }
   };

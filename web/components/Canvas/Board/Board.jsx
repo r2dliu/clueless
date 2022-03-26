@@ -1,8 +1,19 @@
-import React from "react";
+import React, { useContext } from "react";
 import styles from "./Board.module.scss";
 
-function Board({ gameId }) {
-  return <div className={styles.Board}>{`gameid: ${gameId}`}</div>;
+function Board() {
+  const { gameIdContext, clientIdContext, gameStateContext } =
+    useContext(GameContext);
+
+  const [gameId, _setGameId] = gameIdContext;
+  const [clientId, _setClientId] = clientIdContext;
+
+  return (
+    <div className={styles.Board}>
+      <div>{`you are: ${clientId}`}</div>
+      <div>{`gameid: ${gameId}`}</div>
+    </div>
+  );
 }
 
 export default Board;
