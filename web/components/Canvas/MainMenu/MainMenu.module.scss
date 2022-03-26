@@ -1,28 +1,27 @@
-.MainMenu {
+.Menu {
   display: flex;
   justify-content: center;
-  align-items: center;
-  height: 100%;
+  margin-top: 50%;
+  min-width: 700px;
+  min-height: 500px;
 
-  .buttons {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+  .lineBreak {
+    width: 90%;
+  }
 
-    .newGame {
-      margin-bottom: 20px;
-    }
+  .menuTitle {
+    margin-top: 10%;
+    margin-bottom: 3%;
+    font-size: 36px;
+    font-weight: bold;
+  }
 
-    .joinGame {
-      margin-top: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+  .createGame {
+    margin-top: 10%;
+    margin-bottom: 10%;
+  }
 
-      .textField {
-        padding-right: 20px;
-      }
-    }
+  .joinGame {
+    margin-top: 10%;
   }
 }

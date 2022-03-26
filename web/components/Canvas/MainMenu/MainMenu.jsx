@@ -1,13 +1,22 @@
-import React, { useState, useCallback, useEffect, useRef } from "react";
-import { v4 as uuidv4 } from "uuid";
-import { Button, TextField } from "@mui/material";
+import React, { useState, useRef } from "react";
+import TextField from "@mui/material/TextField";
 import styles from "./MainMenu.module.scss";
 
-function MainMenu({ setGameId }) {
+import {
+  Button,
+  Card,
+  CardContent,
+  Container,
+  Typography,
+} from "@mui/material";
+
+function MainMenu({ setGameId, setClientId }) {
   const textFieldRef = useRef();
   const [newGameError, setNewGameError] = useState("");
+  const [clientIdInput, setClientIdInput] = useState(null);
 
   const createNewGame = async () => {
+    console.log("hello " + clientIdInput);
     console.log("creating new game");
     const response = await fetch("/new_game");
     if (!response.ok) {
@@ -16,6 +25,7 @@ function MainMenu({ setGameId }) {
       const gameId = await response.json();
       console.log(gameId);
       setGameId(gameId);
+      setClientId(displayName);
     }
   };
 
@@ -25,35 +35,35 @@ function MainMenu({ setGameId }) {
   };
 
   return (
-    <div className={styles.MainMenu}>
-      <div className={styles.buttons}>
-        <div className={styles.newGame}>
+    <Card className={styles.Menu}>
+      <CardContent>
+        <Typography className={styles.menuTitle}>
+          Welcome to Clueless
+        </Typography>
+        <Container className={styles.userId}>
+          <TextField
+            onChange={(e) => setClientIdInput(e.target.value)}
+            label="Display Name"
+            variant="standard"
+            helperText="Please enter your display name."
+            fullWidth
+            required
+          />
+        </Container>
+        <Container className={styles.createGame}>
           <Button variant="contained" onClick={createNewGame}>
             Create New Game
           </Button>
           {/* todo show error if unable to create new game */}
-        </div>
+        </Container>
         <div> --- or --- </div>
-        <div className={styles.joinGame}>
-          <div>
-            <TextField
-              className={styles.textField}
-              id="outlined-basic"
-              label="Game ID"
-              variant="outlined"
-              inputRef={textFieldRef}
-              onSubmit={joinGame}
-            />
-          </div>
-          <div>
-            <Button variant="contained" onClick={joinGame}>
-              Join
-            </Button>
-          </div>
+        <Container className={styles.joinGame}>
+          <TextField id="standard-basic" label="Game ID" variant="standard" />
+          <Button variant="contained">Join Game</Button>
           {/* todo show error if unable to join */}
-        </div>
-      </div>
-    </div>
+        </Container>
+      </CardContent>
+    </Card>
   );
 }
 
