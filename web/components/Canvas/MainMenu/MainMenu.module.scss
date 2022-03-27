@@ -1,28 +1,28 @@
 .MainMenu {
   display: flex;
   justify-content: center;
-  align-items: center;
-  height: 100%;
+  padding: 24px;
+  max-width: 800px;
 
-  .buttons {
+  .menuTitle {
+    padding-bottom: 24px;
+    font-size: 36px;
+    font-weight: bold;
+  }
+
+  .createGame {
+    padding: 24px 0;
+  }
+
+  .joinGame {
+    padding-top: 24px;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    flex-direction: row;
+    justify-content: space-between;
     align-items: center;
 
-    .newGame {
-      margin-bottom: 20px;
-    }
-
-    .joinGame {
-      margin-top: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-
-      .textField {
-        padding-right: 20px;
-      }
+    .button {
+      padding-left: 24px;
     }
   }
 }
