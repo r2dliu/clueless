@@ -1,5 +1,6 @@
 import json
 import random
+import itertools
 from typing import Dict, List, Tuple
 
 class Clueless:
@@ -111,7 +112,7 @@ class Clueless:
               player and a list of extra cards to be displayed to all players"""
 
         # ensure case file has been filled
-        assert self.state.concealed_scenario 
+        assert self.state['concealed_scenario']
 
         # determine cards to be distributed
         to_be_distributed = set(self.cards).difference(
@@ -164,19 +165,23 @@ class Clueless:
         return turn_order
 
 
-    def get_next_player(self) -> Tuple:
+    def get_next_player(self, player: str) -> Tuple:
         """ Returns the next token to move and their client ID. 
         Note: does not update the game state, expected to be handled by caller.
+        This function is also used to determine next player up to disprove a 
+        suggestion.
+
+        Args:
+            player: current player's token (i.e. 'professor_plum')
         """
-        # get current player token
-        current_player = self.state.current_turn[1]
-        idx = self.state.turn_order.index('current_player')
+
+        idx = self.state['turn_order'].index(player)
         
         # get next player token
         try:
-            next_player = self.state.turn_order[idx + 1]
+            next_player = self.state['turn_order'][idx + 1]
         except IndexError:
-            next_player = self.state.turn_order[0]
+            next_player = self.state['turn_order'][0]
         
         # get client id associated with next player
         for client_id, token in self.players.items():
@@ -186,9 +191,46 @@ class Clueless:
         return next_player, client_id
 
 
-    def allowed_moves(self, player):
-        # returns list of allowed moves
-        pass
+    def allowed_moves(self, player: str) -> List:
+        """ Determines locations player may move their token
+
+        Args:
+            player: current player's token (i.e. 'professor_plum')
+        
+        Returns:
+            A list of allowed locations
+        """
+        allowed_moves = []
+        
+        # get current token location
+        current_loc = self.state['suspect_locations'][player]
+        
+        # if first time through turn rotation, can only move into a hallway
+        # TODO
+        if False:
+            allowed_moves = []
+
+        # if in hallway, can move into either adjacent room
+        elif current_loc in self.hallways:
+            allowed_moves = current_loc.split('_')
+        
+        # if in room
+        else:
+            # could use a secret passage
+            for passage in secret_passages:
+                if current_loc in passage:
+                    allowed_moves.append(passage)
+
+            # could stay in room (if moved to current room by opponent)
+            # TODO 
+
+            # could move to an unblocked hallway
+            for hallway in hallways:
+                if (current_loc in hallway and 
+                    hallway not in self.state['suspect_locations'].values()):
+                    allowed_moves.append(hallway)
+
+        return allowed_moves
 
 
     def verify_accusation(self, accusation: Dict[str, str]) -> bool:
@@ -204,4 +246,4 @@ class Clueless:
               concealed case file
         """
 
-        return accusation == self.state.concealed_scenario
+        return accusation == self.state['concealed_scenario']
