@@ -5,9 +5,9 @@ from typing import Dict, List, Tuple
 
 class Clueless:
     # TODO suggestion logic, available movement options
-    # TODO give connection manager to clueless class
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, connection_manager):
+        
         self.rooms = [
             'study', 'hall', 'lounge', 'library', 'billiard', 'dining',
             'conservatory', 'ballroom', 'kitchen'
@@ -29,6 +29,10 @@ class Clueless:
         ]
         self.secret_passages = ['study_kitchen', 'lounge_conservatory']
 
+        # TODO connection manager should contain each client's character choice
+          # self.players should be filled & board should be initialized 
+          # after all clients have connected and game starts. 
+        
         # players dict holds client_id: character assignments
         self.players = {}
         self.state = self.initialize_board(self.players)
@@ -206,9 +210,9 @@ class Clueless:
         current_loc = self.state['suspect_locations'][player]
         
         # if first time through turn rotation, can only move into a hallway
-        # TODO
+        # TODO track first turn or pass as boolean into this function
         if False:
-            allowed_moves = []
+            allowed_moves = [current_loc]
 
         # if in hallway, can move into either adjacent room
         elif current_loc in self.hallways:
@@ -222,7 +226,8 @@ class Clueless:
                     allowed_moves.append(passage)
 
             # could stay in room (if moved to current room by opponent)
-            # TODO 
+            # TODO track if token was moved by a suggestion since player's last
+              # turn, or pass into this function -- depends where we handle suggestions
 
             # could move to an unblocked hallway
             for hallway in hallways:
