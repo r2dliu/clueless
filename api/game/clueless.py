@@ -7,7 +7,7 @@ class Clueless:
     # TODO suggestion logic, available movement options
 
     def __init__(self, connection_manager):
-        
+
         self.rooms = [
             'study', 'hall', 'lounge', 'library', 'billiard', 'dining',
             'conservatory', 'ballroom', 'kitchen'
@@ -29,24 +29,30 @@ class Clueless:
         ]
         self.secret_passages = ['study_kitchen', 'lounge_conservatory']
 
+        
+        self.starting_locations = ['scarlet_start', 'plum_start', 'green_start',
+                                   'white_start', 'peacock_start', 'mustard_start'
+        ]
+        self.first_moves = {'miss_scarlet': 'hall_lounge', 
+                            'professor_plum': 'library_study',
+                            'mr_green': 'ballroom_conservatory',
+                            'mrs_white': 'kitchen_ballroom', 
+                            'mrs_peacock': 'conservatory_library', 
+                            'colonel_mustard': 'lounge_dining'}
+
+
         # TODO connection manager should contain each client's character choice
           # self.players should be filled & board should be initialized 
           # after all clients have connected and game starts. 
-        
-        # players dict holds client_id: character assignments
-        self.players = {}
-        self.state = self.initialize_board(self.players)
+        self.players = []
+        self.state = self.initialize_board()
     
 
-    def jsonify(self):
+    def get_game_state(self):
         return json.dumps(self.state)
 
 
-    def get_game_state(self):
-        return self.state
-
-
-    def initialize_board(self, players: Dict) -> Dict:
+    def initialize_board(self) -> Dict:
         """ Places characters in starting locations, generates scenario, 
         distributes cards """
 
@@ -54,21 +60,17 @@ class Clueless:
         state = {
             'suspect_locations': {},  # dict of suspect: room/hallway loc
             'concealed_scenario': {},
-            'player_cards': {},  # dict of client id: player's card list 
+            'player_cards': {},  # dict of player: player's card list 
             'visible_cards': [],  # list of cards shown to all players
             'turn_order': [],  # player turn order
-            'current_turn': (),  # whose turn is it? (client id, charname)
+            'current_turn': str,  # player token 
             'suggestion': {}  # holds current suggestion players must disprove
         }
+
         # starting locations
-        state['suspect_locations'] = {
-            'miss_scarlet': 'hall_lounge',
-            'professor_plum': 'library_study',
-            'mr_green': 'ballroom_conservatory',
-            'mrs_white': 'kitchen_ballroom',
-            'mrs_peacock': 'conservatory_library',
-            'colonel_mustard': ' lounge_dining',
-        }
+        state['suspect_locations'] = dict(zip(self.first_moves.keys(), 
+                                              self.starting_locations))
+
         # randomly generated case file cards
         state['concealed_scenario'] = self.create_scenario()
 
@@ -79,11 +81,11 @@ class Clueless:
         state['turn_order'] = self.generate_turn_order()
 
 
-        # get client id of first player to move
-        for client_id, token in self.players.items():
+        # get first player to move
+        for token in self.players:
             if state['turn_order'][0] == token:
                 break
-        state['current_turn'] = (client_id, state['turn_order'][0])
+        state['current_turn'] = state['turn_order'][0]
         
         return state
 
@@ -112,7 +114,7 @@ class Clueless:
         """ Shuffles and evenly distributes cards amongst players
         
         Returns:
-            A dict containing {client_id: [cards]} pairs for each individual
+            A dict containing {player: [cards]} pairs for each individual
               player and a list of extra cards to be displayed to all players"""
 
         # ensure case file has been filled
@@ -132,7 +134,7 @@ class Clueless:
 
         # distribute 
         split = [to_be_distributed[i:i + n] for i in range(0, n_cards, n)]
-        player_cards = dict(zip(self.players.keys(), split[:-1]))
+        player_cards = dict(zip(self.players, split[:-1]))
         visible_cards = split[-1]
 
         return player_cards, visible_cards
@@ -142,8 +144,8 @@ class Clueless:
         """ Clue rules state Miss scarlet moves first, and then play proceeds
         clockwise """
 
-        # if miss scarlet isn't a chosen player token
-        player_tokens = list(self.players.values())
+        # if miss scarlet isn't a chosen player token. 
+        player_tokens = self.players[:] # preserving order of self.players just incase..prob not needed
 
         token_order = [
             'miss_scarlet',
@@ -170,7 +172,7 @@ class Clueless:
 
 
     def get_next_player(self, player: str) -> Tuple:
-        """ Returns the next token to move and their client ID. 
+        """ Returns the next token to move.
         Note: does not update the game state, expected to be handled by caller.
         This function is also used to determine next player up to disprove a 
         suggestion.
@@ -187,12 +189,7 @@ class Clueless:
         except IndexError:
             next_player = self.state['turn_order'][0]
         
-        # get client id associated with next player
-        for client_id, token in self.players.items():
-            if next_player == token:
-                break
-        
-        return next_player, client_id
+        return next_player
 
 
     def allowed_moves(self, player: str) -> List:
@@ -210,9 +207,8 @@ class Clueless:
         current_loc = self.state['suspect_locations'][player]
         
         # if first time through turn rotation, can only move into a hallway
-        # TODO track first turn or pass as boolean into this function
-        if False:
-            allowed_moves = [current_loc]
+        if 'start' in current_loc:
+            allowed_moves = [self.first_moves[player]]
 
         # if in hallway, can move into either adjacent room
         elif current_loc in self.hallways:
@@ -221,7 +217,7 @@ class Clueless:
         # if in room
         else:
             # could use a secret passage
-            for passage in secret_passages:
+            for passage in self.secret_passages:
                 if current_loc in passage:
                     allowed_moves.append(passage)
 
