@@ -23,3 +23,6 @@ class ConnectionManager:
     async def broadcast(self, message: json):
         for connection in self.active_connections.values():
             await connection.send_json(message)
+
+    def get_connections(self):
+        return self.active_connections

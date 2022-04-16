@@ -13,6 +13,7 @@ function Board() {
   const [gameState, _setGameState] = gameStateContext;
 
   const gameStateRef = useRef();
+  const [startGameError, setStartGameError] = useState("");
 
   useEffect(() => {
     if (websocket.current) {
@@ -29,11 +30,38 @@ function Board() {
     }
   }, [websocket]);
 
+  const startGame = async () => {
+    console.log(`starting game with ${'placeholderLOL'}/6 players`);
+    const response = await fetch("/start_game", {
+      method: "GET", headers: {
+        "Content-type": "application/json"
+      }
+    });
+    if (!response.ok) {
+      setStartGameError(response.statusText);
+    } else {
+      const state = await response.json();
+      _setGameState(state);
+    }
+  };
+
   return (
     <div className={styles.Board}>
       <div>{`you are: ${clientId}`}</div>
       <div>{`gameid: ${gameId}`}</div>
       <div>{`state: ${gameState}`}</div>
+
+      <div>
+        <b>start game</b>
+        {messages.map((message, i) => (
+          <p key={i}>{message}</p>
+        ))}
+        <Button
+          id="start_game"
+          variant="outlined"
+          onClick={startGame}
+        />
+      </div>
 
       <div>
         <b>make move</b>
@@ -54,22 +82,24 @@ function Board() {
         />
       </div>
 
-      <b>make accusation</b>
-      {messages.map((message, i) => (
-        <p key={i}>{message}</p>
-      ))}
-      <Button
-        id="make_accusation"
-        variant="outlined"
-        onClick={() => {
-          websocket?.current?.send(
-            JSON.stringify({
-              state: gameState,
-              clientId: clientId,
-            })
-          );
-        }}
-      />
+      <div>
+        <b>make accusation</b>
+        {messages.map((message, i) => (
+          <p key={i}>{message}</p>
+        ))}
+        <Button
+          id="make_accusation"
+          variant="outlined"
+          onClick={() => {
+            websocket?.current?.send(
+              JSON.stringify({
+                state: gameState,
+                clientId: clientId,
+              })
+            );
+          }}
+        />
+      </div>
     </div >
   );
 }

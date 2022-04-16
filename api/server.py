@@ -24,6 +24,13 @@ def create_game():
     return id
 
 
+@app.get("/start_game")
+def start_game(id: str):
+    state = games_by_id[id].initialize_board()
+    # state = games_by_id[id].get_game_state() # should I be using this?
+    return state
+
+
 @app.websocket("/ws/{game_uuid}/{client_uuid}")
 async def websocket_connection(websocket: WebSocket, game_uuid: str,
                                client_uuid: str):

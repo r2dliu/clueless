@@ -1,12 +1,19 @@
 import json
 import random
+from enum import Enum
 import itertools
 from typing import Dict, List, Tuple
+from connection_manager import ConnectionManager
 
 class Clueless:
     # TODO suggestion logic, available movement options
 
     def __init__(self, connection_manager):
+
+        class GamePhase(Enum):
+            NOT_STARTED = 0
+            IN_PROGRESS = 1
+            COMPLETED = 2
 
         self.rooms = [
             'study', 'hall', 'lounge', 'library', 'billiard', 'dining',
@@ -44,8 +51,17 @@ class Clueless:
         # TODO connection manager should contain each client's character choice
           # self.players should be filled & board should be initialized 
           # after all clients have connected and game starts. 
-        self.players = []
-        self.state = self.initialize_board()
+        self.players = connection_manager.get_connections()
+        self.state = {# data structs are just placeholders; can/should be changed
+            'game_phase': GamePhase.NOT_STARTED, # determines what view players see 
+            'suspect_locations': {},  # dict of suspect: room/hallway loc
+            'concealed_scenario': {},
+            'player_cards': {},  # dict of player: player's card list 
+            'visible_cards': [],  # list of cards shown to all players
+            'turn_order': [],  # player turn order
+            'current_turn': str,  # player token 
+            'suggestion': {}  # holds current suggestion players must disprove
+        }
     
 
     def get_game_state(self):
@@ -56,38 +72,27 @@ class Clueless:
         """ Places characters in starting locations, generates scenario, 
         distributes cards """
 
-        # data structs are just placeholders; can/should be changed
-        state = {
-            'suspect_locations': {},  # dict of suspect: room/hallway loc
-            'concealed_scenario': {},
-            'player_cards': {},  # dict of player: player's card list 
-            'visible_cards': [],  # list of cards shown to all players
-            'turn_order': [],  # player turn order
-            'current_turn': str,  # player token 
-            'suggestion': {}  # holds current suggestion players must disprove
-        }
-
         # starting locations
-        state['suspect_locations'] = dict(zip(self.first_moves.keys(), 
+        self.state['suspect_locations'] = dict(zip(self.first_moves.keys(), 
                                               self.starting_locations))
 
         # randomly generated case file cards
-        state['concealed_scenario'] = self.create_scenario()
+        self.state['concealed_scenario'] = self.create_scenario()
 
         # shuffle and distribute cards to players
-        state['player_cards'], state['visible_cards'] = self.distribute_cards()
+        self.state['player_cards'], self.state['visible_cards'] = self.distribute_cards()
 
         # set turn order for the game
-        state['turn_order'] = self.generate_turn_order()
+        self.state['turn_order'] = self.generate_turn_order()
 
 
         # get first player to move
         for token in self.players:
-            if state['turn_order'][0] == token:
+            if self.state['turn_order'][0] == token:
                 break
-        state['current_turn'] = state['turn_order'][0]
+        self.state['current_turn'] = self.state['turn_order'][0]
         
-        return state
+        return self.state
 
 
     def create_scenario(self) -> Dict[str, str]:
@@ -122,7 +127,7 @@ class Clueless:
 
         # determine cards to be distributed
         to_be_distributed = set(self.cards).difference(
-                            set(concealed_scenario.values())
+                            set(self.state['concealed_scenario'].values())
         )
         to_be_distributed = list(to_be_distributed)
         random.shuffle(to_be_distributed)
