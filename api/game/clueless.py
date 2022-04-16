@@ -1,8 +1,13 @@
-class Clueless:
-    # TODO add game logic
+import json
+import random
+import itertools
+from typing import Dict, List, Tuple
 
-    # TODO give connection manager to clueless class
-    def __init__(self, *args, **kwargs):
+class Clueless:
+    # TODO suggestion logic, available movement options
+
+    def __init__(self, connection_manager):
+
         self.rooms = [
             'study', 'hall', 'lounge', 'library', 'billiard', 'dining',
             'conservatory', 'ballroom', 'kitchen'
@@ -24,12 +29,31 @@ class Clueless:
         ]
         self.secret_passages = ['study_kitchen', 'lounge_conservatory']
 
-        # players dict holds client_id: character assignments
-        self.players = {}
-        self.state = self.initialize_board(self.players)
+        
+        self.starting_locations = ['scarlet_start', 'plum_start', 'green_start',
+                                   'white_start', 'peacock_start', 'mustard_start'
+        ]
+        self.first_moves = {'miss_scarlet': 'hall_lounge', 
+                            'professor_plum': 'library_study',
+                            'mr_green': 'ballroom_conservatory',
+                            'mrs_white': 'kitchen_ballroom', 
+                            'mrs_peacock': 'conservatory_library', 
+                            'colonel_mustard': 'lounge_dining'}
 
-    def initialize_board(self, players):
-        """ Places characters in starting locations, generates sceanario, 
+
+        # TODO connection manager should contain each client's character choice
+          # self.players should be filled & board should be initialized 
+          # after all clients have connected and game starts. 
+        self.players = []
+        self.state = self.initialize_board()
+    
+
+    def get_game_state(self):
+        return json.dumps(self.state)
+
+
+    def initialize_board(self) -> Dict:
+        """ Places characters in starting locations, generates scenario, 
         distributes cards """
 
         # data structs are just placeholders; can/should be changed
@@ -39,41 +63,188 @@ class Clueless:
             'player_cards': {},  # dict of player: player's card list 
             'visible_cards': [],  # list of cards shown to all players
             'turn_order': [],  # player turn order
-            'current_turn': 0,  # whose turn is it
+            'current_turn': str,  # player token 
             'suggestion': {}  # holds current suggestion players must disprove
         }
-        # starting locations
-        state['suspect_locations'] = {
-            'colonel_mustard': ' lounge_dining',
-            'miss_scarlet': 'hall_lounge',
-            'professor_plum': 'library_study',
-            'mr_green': 'ballroom_conservatory',
-            'mrs_white': 'kitchen_ballroom',
-            'mrs_peacock': 'conservatory_library',
-        }
 
+        # starting locations
+        state['suspect_locations'] = dict(zip(self.first_moves.keys(), 
+                                              self.starting_locations))
+
+        # randomly generated case file cards
+        state['concealed_scenario'] = self.create_scenario()
+
+        # shuffle and distribute cards to players
+        state['player_cards'], state['visible_cards'] = self.distribute_cards()
+
+        # set turn order for the game
+        state['turn_order'] = self.generate_turn_order()
+
+
+        # get first player to move
+        for token in self.players:
+            if state['turn_order'][0] == token:
+                break
+        state['current_turn'] = state['turn_order'][0]
+        
         return state
 
-    def create_scenario(self):
+
+    def create_scenario(self) -> Dict[str, str]:
+        """ Selects a random weapon, suspect, and room to populate the case file
+
+        Returns:
+            A dictionary of the form {'suspect': name of suspect,
+                                      'room': name of room,
+                                      'weapon': name of weapon}
+        """
+
         # picks a random weapon, suspect, room to store in case envelope
-        pass
+        suspect = random.choice(self.suspects)
+        room = random.choice(self.rooms)
+        weapon = random.choice(self.weapons)
 
-    def distribute_cards(self):
-        # randomly distribute cards
-        pass
+        keys = ['suspect', 'room', 'weapon']
+        values = [suspect, room, weapon]
 
-    def generate_turn_order(self):
-        # randomly picks player move order
-        pass
+        return dict(zip(keys, values))
 
-    def get_next_player(self, current_player):
-        # returns next player to move
-        pass
 
-    def allowed_moves(self, player):
-        # returns list of allowed moves
-        pass
+    def distribute_cards(self) -> Tuple:
+        """ Shuffles and evenly distributes cards amongst players
+        
+        Returns:
+            A dict containing {player: [cards]} pairs for each individual
+              player and a list of extra cards to be displayed to all players"""
 
-    def verify_accusation(self, accusation):
-        # returns
-        pass
+        # ensure case file has been filled
+        assert self.state['concealed_scenario']
+
+        # determine cards to be distributed
+        to_be_distributed = set(self.cards).difference(
+                            set(concealed_scenario.values())
+        )
+        to_be_distributed = list(to_be_distributed)
+        random.shuffle(to_be_distributed)
+        
+        # determine how many cards each player gets
+        n_cards = len(to_be_distributed)
+        n_players = len(self.players)
+        n = n_cards // n_players
+
+        # distribute 
+        split = [to_be_distributed[i:i + n] for i in range(0, n_cards, n)]
+        player_cards = dict(zip(self.players, split[:-1]))
+        visible_cards = split[-1]
+
+        return player_cards, visible_cards
+
+
+    def generate_turn_order(self) -> List:
+        """ Clue rules state Miss scarlet moves first, and then play proceeds
+        clockwise """
+
+        # if miss scarlet isn't a chosen player token. 
+        player_tokens = self.players[:] # preserving order of self.players just incase..prob not needed
+
+        token_order = [
+            'miss_scarlet',
+            'colonel_mustard',
+            'mrs_white',
+            'mr_green',
+            'mrs_peacock',
+            'professor_plum',
+        ]
+        for token in token_order:
+            if token in player_tokens:
+                break
+        turn_order = [token]
+
+        # no concept of clockwise in UI currently, so randomize for now
+        random.shuffle(player_tokens)
+        for player_token in player_tokens:
+            if player_token != token: # first player already chosen
+                turn_order.append(player_token)
+
+        assert len(player_tokens) == len(turn_order) # future unit test 
+
+        return turn_order
+
+
+    def get_next_player(self, player: str) -> Tuple:
+        """ Returns the next token to move.
+        Note: does not update the game state, expected to be handled by caller.
+        This function is also used to determine next player up to disprove a 
+        suggestion.
+
+        Args:
+            player: current player's token (i.e. 'professor_plum')
+        """
+
+        idx = self.state['turn_order'].index(player)
+        
+        # get next player token
+        try:
+            next_player = self.state['turn_order'][idx + 1]
+        except IndexError:
+            next_player = self.state['turn_order'][0]
+        
+        return next_player
+
+
+    def allowed_moves(self, player: str) -> List:
+        """ Determines locations player may move their token
+
+        Args:
+            player: current player's token (i.e. 'professor_plum')
+        
+        Returns:
+            A list of allowed locations
+        """
+        allowed_moves = []
+        
+        # get current token location
+        current_loc = self.state['suspect_locations'][player]
+        
+        # if first time through turn rotation, can only move into a hallway
+        if 'start' in current_loc:
+            allowed_moves = [self.first_moves[player]]
+
+        # if in hallway, can move into either adjacent room
+        elif current_loc in self.hallways:
+            allowed_moves = current_loc.split('_')
+        
+        # if in room
+        else:
+            # could use a secret passage
+            for passage in self.secret_passages:
+                if current_loc in passage:
+                    allowed_moves.append(passage)
+
+            # could stay in room (if moved to current room by opponent)
+            # TODO track if token was moved by a suggestion since player's last
+              # turn, or pass into this function -- depends where we handle suggestions
+
+            # could move to an unblocked hallway
+            for hallway in hallways:
+                if (current_loc in hallway and 
+                    hallway not in self.state['suspect_locations'].values()):
+                    allowed_moves.append(hallway)
+
+        return allowed_moves
+
+
+    def verify_accusation(self, accusation: Dict[str, str]) -> bool:
+        """ Checks if a player's accusation is correct
+        
+        Args:
+            accusation: A dictionary of the form 
+                            {'suspect': name of suspect,
+                            'room': name of room,
+                            'weapon': name of weapon}
+        Returns:
+            An indication of whether or not accusation matches the cards in the
+              concealed case file
+        """
+
+        return accusation == self.state['concealed_scenario']

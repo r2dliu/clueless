@@ -19,7 +19,7 @@ def read_root():
 @app.get("/new_game")
 def create_game():
     id = uuid4()
-    game = Clueless(1, 2)
+    game = Clueless(connection_manager)
     games_by_id[id] = game
     return id
 
