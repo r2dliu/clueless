@@ -280,7 +280,7 @@ class Clueless:
 
         return allowed_moves
 
-    def verify_accusation(self, accusation: Dict[str, str]) -> bool:
+    def verify_accusation(self, accusation: str) -> bool:
         """Checks if a player's accusation is correct
 
         Args:
@@ -293,4 +293,4 @@ class Clueless:
               concealed case file
         """
 
-        return accusation == self.state["concealed_scenario"]
+        return json.loads(accusation) == self.state["concealed_scenario"]
