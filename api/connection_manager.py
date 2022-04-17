@@ -6,7 +6,8 @@ class ConnectionManager:
 
     def __init__(self):
         self.active_connections: dict[str, WebSocket] = {}
-
+        self.id_to_char: dict[str, str] = {} #map client id: chosen character
+    
     def has_existing_connection(self, uuid):
         return True if uuid in self.active_connections else False
 
@@ -24,5 +25,12 @@ class ConnectionManager:
         for connection in self.active_connections.values():
             await connection.send_json(message)
 
-    def get_connections(self):
-        return self.active_connections
+    def assign_character(self, uuid, character: str):
+        """ Assigns clue character to a player """
+        self.id_to_char[uuid] = character
+        return 
+    
+    def get_players(self):
+        """ Returns list of current player's selected characters """
+        return list(self.id_to_char.values())
+

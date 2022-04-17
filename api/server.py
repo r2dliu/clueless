@@ -19,16 +19,19 @@ def read_root():
 @app.get("/new_game")
 def create_game():
     id = uuid4()
-    game = Clueless(connection_manager)
-    games_by_id[id] = game
+    games_by_id[id] = Clueless(connection_manager)
     return id
 
 
-@app.get("/start_game")
+@app.get("/start_game/{id}")
 def start_game(id: str):
-    state = games_by_id[id].initialize_board()
-    # state = games_by_id[id].get_game_state() # should I be using this?
-    return state
+    try:
+        return games_by_id[id].initialize_board()
+    except KeyError:
+        # game wasn't created?
+        games_by_id[id] = Clueless(connection_manager)
+        return games_by_id[id].initialize_board()
+
 
 
 @app.websocket("/ws/{game_uuid}/{client_uuid}")

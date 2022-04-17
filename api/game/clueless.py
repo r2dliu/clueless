@@ -10,6 +10,8 @@ class Clueless:
 
     def __init__(self, connection_manager):
 
+        self.connection_manager = connection_manager
+
         class GamePhase(Enum):
             NOT_STARTED = 0
             IN_PROGRESS = 1
@@ -47,11 +49,8 @@ class Clueless:
                             'mrs_peacock': 'conservatory_library', 
                             'colonel_mustard': 'lounge_dining'}
 
+        self.players = connection_manager.get_players()
 
-        # TODO connection manager should contain each client's character choice
-          # self.players should be filled & board should be initialized 
-          # after all clients have connected and game starts. 
-        self.players = connection_manager.get_connections()
         self.state = {# data structs are just placeholders; can/should be changed
             'game_phase': GamePhase.NOT_STARTED, # determines what view players see 
             'suspect_locations': {},  # dict of suspect: room/hallway loc
@@ -65,12 +64,20 @@ class Clueless:
     
 
     def get_game_state(self):
-        return json.dumps(self.state)
+        return self.state
 
 
     def initialize_board(self) -> Dict:
         """ Places characters in starting locations, generates scenario, 
         distributes cards """
+        
+        # self.players must be filled before board is initialized
+        players = self.connection_manager.get_players()
+        if len(players) == 0:
+            self.state = {'you screwed up': 'no players in init_board()'}
+            return self.state
+        
+        self.players = players
 
         # starting locations
         self.state['suspect_locations'] = dict(zip(self.first_moves.keys(), 
