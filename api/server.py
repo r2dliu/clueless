@@ -12,13 +12,13 @@ connection_manager = ConnectionManager()
 games_by_id = {}
 
 ### uncomment to test server
-#connection_manager.id_to_char = {
+# connection_manager.id_to_char = {
 #    str(uuid4()): 'miss_scarlet',
 #    str(uuid4()): 'professor_plum'
 #    }
-#games_by_id['test'] = Clueless(connection_manager)
-#games_by_id['test'].initialize_board()
-#test_acc = json.loads('{"suspect": "professor_plum", "weapon": "lead_pipe","room": "ballroom"}')
+# games_by_id['test'] = Clueless(connection_manager)
+# games_by_id['test'].initialize_board()
+# test_acc = json.loads('{"suspect": "professor_plum", "weapon": "lead_pipe","room": "ballroom"}')
 #####
 
 
@@ -34,23 +34,29 @@ def create_game():
     return id
 
 
-@app.get("/start_game/{id}")
-def start_game(id: str):
+# FIXME: Had trouble with {id} part of route so just having
+# it return the game state of the only game we have running
+# to test board
+# @app.get("/start_game/{id}")
+# def start_game(id: str):
+@app.get("/start_game")
+def start_game():
     # start game and return initial state
     try:
-        return json.dumps(games_by_id[id].initialize_board())
+        # return json.dumps(games_by_id[id].initialize_board())
+        return json.dumps(games_by_id[0].initialize_board())
     except KeyError:
         # game wasn't created?
-        games_by_id[id] = Clueless(connection_manager)
-        return json.dumps(games_by_id[id].initialize_board())
-
+        # games_by_id[id] = Clueless(connection_manager)
+        # return json.dumps(games_by_id[id].initialize_board())
+        games_by_id[0] = Clueless(connection_manager)
+        return json.dumps(games_by_id[0].initialize_board())
 
 
 @app.get("/get_state")
 def get_state(id: str):
     # query clueless for current state
     return games_by_id[id].get_game_state()
-
 
 
 @app.put("/update_state")
@@ -72,10 +78,8 @@ def verify_accusation(id: str, accusation: str):
     return json.dumps(games_by_id[id].verify_accusation(accusation))
 
 
-
 @app.websocket("/ws/{game_uuid}/{client_uuid}")
-async def websocket_connection(websocket: WebSocket, game_uuid: str,
-                               client_uuid: str):
+async def websocket_connection(websocket: WebSocket, game_uuid: str, client_uuid: str):
     if UUID(game_uuid) in games_by_id:
         if connection_manager.has_existing_connection(client_uuid):
             # this username already exists in game, prevent connection
@@ -92,8 +96,7 @@ async def websocket_connection(websocket: WebSocket, game_uuid: str,
                 await connection_manager.broadcast(data)
         except WebSocketDisconnect:
             connection_manager.disconnect(client_uuid)
-            await connection_manager.broadcast(
-                json.dumps({"disconnect": client_uuid}))
+            await connection_manager.broadcast(json.dumps({"disconnect": client_uuid}))
     else:
         # this game doesn't exist
         await websocket.close(code=404)

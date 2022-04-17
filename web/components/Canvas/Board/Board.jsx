@@ -100,6 +100,25 @@ function Board() {
           }}
         />
       </div>
+      
+      <div>
+        <b>select character</b>
+        {messages.map((message, i) => (
+          <p key={i}>{message}</p>
+        ))}
+        <Button
+          id="select_character"
+          variant="outlined"
+          onClick={() => {
+            websocket?.current?.send(
+              JSON.stringify({
+                state: gameState,
+                clientId: clientId,
+              })
+            );
+          }}
+        />
+      </div>
     </div >
   );
 }
