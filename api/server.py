@@ -31,7 +31,7 @@ def read_root():
 def create_game():
     id = uuid4()
     games_by_id[id] = Clueless(connection_manager)
-    return id
+    return id, json.dumps(games_by_id[id].get_game_state())
 
 
 # FIXME: Had trouble with {id} part of route so just having
@@ -53,10 +53,15 @@ def start_game():
         return json.dumps(games_by_id[0].initialize_board())
 
 
-@app.get("/get_state")
+@app.get("/get_connections")
+def get_connections(id: str):
+    return json.dumps(games_by_id[id].get_connections())
+
+
+@app.get("/get_state/")
 def get_state(id: str):
     # query clueless for current state
-    return games_by_id[id].get_game_state()
+    return json.dumps(games_by_id[id].get_game_state())
 
 
 @app.put("/update_state")
@@ -79,7 +84,8 @@ def verify_accusation(id: str, accusation: str):
 
 
 @app.websocket("/ws/{game_uuid}/{client_uuid}")
-async def websocket_connection(websocket: WebSocket, game_uuid: str, client_uuid: str):
+async def websocket_connection(websocket: WebSocket, game_uuid: str,
+                               client_uuid: str):
     if UUID(game_uuid) in games_by_id:
         if connection_manager.has_existing_connection(client_uuid):
             # this username already exists in game, prevent connection
@@ -94,9 +100,19 @@ async def websocket_connection(websocket: WebSocket, game_uuid: str, client_uuid
                 print("wow got message")
                 print(data)
                 await connection_manager.broadcast(data)
+
+                if ("token" in data.keys()):
+                    status = connection_manager.assign_character(data['clientId'], data['token'])
+                    if status:
+                        print(f"assigned player {data['clientId']} to token {data['token']}")
+                    else:
+                        print("todo token already claimed, grey out button or something")
+                    print(connection_manager.get_players())
+
         except WebSocketDisconnect:
             connection_manager.disconnect(client_uuid)
-            await connection_manager.broadcast(json.dumps({"disconnect": client_uuid}))
+            await connection_manager.broadcast(
+                json.dumps({"disconnect": client_uuid}))
     else:
         # this game doesn't exist
         await websocket.close(code=404)

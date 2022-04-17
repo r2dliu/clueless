@@ -89,12 +89,16 @@ class Clueless:
             "player_cards": {},  # dict of player: player's card list
             "visible_cards": [],  # list of cards shown to all players
             "turn_order": [],  # player turn order
-            "current_turn": str,  # player token
+            "current_turn": "miss_scarlet",  # player token
             "suggestion": {},  # holds current suggestion players must disprove
         }
 
     def get_game_state(self):
-        return json.dumps(self.state)
+        # return json.dumps(self.state)
+        return self.state
+
+    def get_connections(self):
+        return self.players
 
     def initialize_board(self) -> Dict:
         """Places characters in starting locations, generates scenario,
