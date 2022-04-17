@@ -1,5 +1,5 @@
-import json
 import random
+import json
 from enum import Enum
 import itertools
 from typing import Dict, List, Tuple
@@ -52,7 +52,7 @@ class Clueless:
         self.players = connection_manager.get_players()
 
         self.state = {# data structs are just placeholders; can/should be changed
-            'game_phase': GamePhase.NOT_STARTED, # determines what view players see 
+            'game_phase': GamePhase.NOT_STARTED.value, # determines what view players see 
             'suspect_locations': {},  # dict of suspect: room/hallway loc
             'concealed_scenario': {},
             'player_cards': {},  # dict of player: player's card list 
@@ -61,10 +61,9 @@ class Clueless:
             'current_turn': str,  # player token 
             'suggestion': {}  # holds current suggestion players must disprove
         }
-    
 
     def get_game_state(self):
-        return self.state
+        return json.dumps(self.state)
 
 
     def initialize_board(self) -> Dict:
