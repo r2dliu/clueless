@@ -179,9 +179,14 @@ class Clueless:
         n = n_cards // n_players
 
         # distribute
-        split = [to_be_distributed[i : i + n] for i in range(0, n_cards, n)]
-        player_cards = dict(zip(self.players, split[:-1]))
-        visible_cards = split[-1]
+        if not n_cards % n_players: # no extra cards
+            split = [to_be_distributed[i : i + n] for i in range(0, n_cards, n)]
+            player_cards = dict(zip(self.players, split))
+            visible_cards = []
+        else: 
+            split = [to_be_distributed[i : i + n] for i in range(0, n_cards, n)]
+            player_cards = dict(zip(self.players, split[:-1]))
+            visible_cards = split[-1]
 
         return player_cards, visible_cards
 
