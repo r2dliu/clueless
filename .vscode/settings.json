@@ -1,13 +1,17 @@
 {
   "python.envFile": "${workspaceFolder}/api/.env",
-  "python.analysis.extraPaths": ["${workspaceFolder}/api"],
+  "python.analysis.extraPaths": [
+    "${workspaceFolder}/api"
+  ],
   "python.linting.flake8Enabled": true,
-  "python.linting.enabled": true,
+  "python.linting.enabled": false,
   "python.formatting.provider": "yapf",
   "editor.formatOnSave": true,
   "eslint.format.enable": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
   },
-  "eslint.validate": ["javascript"]
+  "eslint.validate": [
+    "javascript"
+  ]
 }
