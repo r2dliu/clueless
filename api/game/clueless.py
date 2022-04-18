@@ -2,6 +2,7 @@ import random
 import json
 from enum import Enum
 from typing import Dict, List, Tuple
+from connection_manager import ConnectionManager
 
 
 class GamePhase(Enum):

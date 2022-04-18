@@ -4,11 +4,22 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from connection_manager import ConnectionManager
 from uuid import UUID, uuid4
 import json
+from typing import Optional
 from game.clueless import Clueless
 
 app = FastAPI()
 connection_manager = ConnectionManager()
 games_by_id = {}
+
+### uncomment to test server
+# connection_manager.id_to_char = {
+#    str(uuid4()): 'miss_scarlet',
+#    str(uuid4()): 'professor_plum'
+#    }
+# games_by_id['test'] = Clueless(connection_manager)
+# games_by_id['test'].initialize_board()
+# test_acc = json.loads('{"suspect": "professor_plum", "weapon": "lead_pipe","room": "ballroom"}')
+#####
 
 
 @app.get("/")
