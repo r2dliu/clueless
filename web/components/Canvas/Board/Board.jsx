@@ -1,5 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Button } from "@mui/material";
+import {
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Chip,
+} from "@mui/material";
 import { GameContext } from "@/components/helpers/GameContext";
 import styles from "./Board.module.scss";
 
@@ -45,6 +52,18 @@ function Board() {
   const [action, setAction] = useState("");
   const [accusation, currentAccusation] = useState({});
 
+  // this is a action history for the incremental demo
+  const [history, setHistory] = useState([]);
+
+  // todo clean these all up into a accusation and suggestion objects. using a single object was causing async issues
+  const [accusationSuspect, setAccusationSuspect] = useState("");
+  const [accusationWeapon, setAccusationWeapon] = useState("");
+  const [accusationRoom, setAccusationRoom] = useState("");
+
+  const [suggestionSuspect, setSuggestionSuspect] = useState("");
+  const [suggestionWeapon, setSuggestionWeapon] = useState("");
+  const [suggestionRoom, setSuggestionRoom] = useState("");
+
   useEffect(() => {
     if (websocket.current) {
       websocket.current.addEventListener("message", (message) => {
@@ -66,14 +85,40 @@ function Board() {
     }
   }, [websocket]);
 
+  useEffect(() => {
+    if (
+      typeof gameState?.previous_move === "string" ||
+      gameState?.previous_move instanceof String
+    ) {
+      console.log(gameState?.previous_move);
+      setHistory((history) => [...history, gameState?.previous_move]);
+    }
+  }, [gameState]);
+
+  function formatLabel(label) {
+    // capitalize and add a space for suspect/room/weapon labels
+    return label
+      .split(/_/g)
+      .map((word) => {
+        return word[0].toUpperCase() + word.substring(1);
+      })
+      .join(" ");
+  }
+
   return (
     <div className={styles.Board}>
+      {/* message dump */}
       <div>{`you are: ${clientId}`}</div>
       <div>{`gameid: ${gameId}`}</div>
       <div className={styles.state}>{`gamestate: ${JSON.stringify(
         gameState
       )}`}</div>
 
+      {history.map((action) => (
+        <Chip label={action} variant="outlined" key={action} />
+      ))}
+
+      {/* character selection */}
       {gameState.game_phase === 0 && (
         <div>
           <b>Select Character</b>
@@ -115,6 +160,12 @@ function Board() {
         </Button>
       )}
 
+      {gameState.game_phase === 1 && (
+        <b>It is {formatLabel(gameState.current_turn)}&apos;s turn</b>
+      )}
+
+      <br></br>
+      {/* game controls */}
       {gameState.game_phase === 1 && (
         <div>
           <Button
@@ -172,118 +223,203 @@ function Board() {
       {/* todo lots of repeatd code beneath, clean up */}
       {gameState.game_phase === 1 && action == "suggestion" && (
         <div className={styles.suggestion}>
-          <div className={styles.column}>
-            <b>Select Character</b>
-            <br></br>
-            {suspects.map((suspect) => (
-              <Button
-                key={`suspect-${suspect}`}
-                variant="outlined"
-                onClick={() => {
-                  // todo
+          <div className={styles.controls}>
+            <FormControl sx={{ minWidth: 160 }}>
+              <InputLabel id="suggestion-suspect-selection-label">
+                Select Suspect
+              </InputLabel>
+              <Select
+                labelId="suggestion-suspect-selection-label"
+                id="suggestion-suspect-selection"
+                value={suggestionSuspect}
+                label="Suspect"
+                onChange={(event) => {
+                  setSuggestionSuspect(event.target.value);
                 }}
               >
-                {suspect}
-              </Button>
-            ))}
-          </div>
-          <div className={styles.column}>
-            <b>Select Weapon</b>
-            <br></br>
-            {weapons.map((weapon) => (
-              <Button
-                key={`weapon-${weapon}`}
-                variant="outlined"
-                onClick={() => {
-                  // todo
+                {suspects.map((suspect) => (
+                  <MenuItem key={suspect} value={suspect}>
+                    {formatLabel(suspect)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            <FormControl sx={{ minWidth: 160 }}>
+              <InputLabel id="suggestion-weapon-selection-label">
+                Select Weapon
+              </InputLabel>
+              <Select
+                labelId="suggestion-weapon-selection-label"
+                id="suggestion-weapon-selection"
+                value={suggestionWeapon}
+                label="Weapon"
+                onChange={(event) => {
+                  setSuggestionWeapon(event.target.value);
                 }}
               >
-                {weapon}
-              </Button>
-            ))}
-          </div>
-          <div className={styles.column}>
-            <b>Select Room</b>
-            <br></br>
-            {rooms.map((room) => (
-              <Button
-                key={`room-${room}`}
-                variant="outlined"
-                onClick={() => {
-                  // todo
+                {weapons.map((weapon) => (
+                  <MenuItem key={weapon} value={weapon}>
+                    {formatLabel(weapon)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            <FormControl sx={{ minWidth: 160 }}>
+              <InputLabel id="suggestion-room-selection-label">
+                Select Room
+              </InputLabel>
+              <Select
+                labelId="suggestion-room-selection-label"
+                id="suggestion-room-selection"
+                value={suggestionRoom}
+                label="Room"
+                onChange={(event) => {
+                  setSuggestionRoom(event.target.value);
                 }}
               >
-                {room}
-              </Button>
-            ))}
+                {rooms.map((room) => (
+                  <MenuItem key={room} value={room}>
+                    {formatLabel(room)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </div>
+          <div className={styles.submission}>
+            <Button
+              key={`submit-suggestion`}
+              variant="contained"
+              onClick={() => {
+                websocket?.current?.send(
+                  JSON.stringify({
+                    type: "suggestion",
+                    suspect: suggestionSuspect,
+                    room: suggestionRoom,
+                    weapon: suggestionWeapon,
+                  })
+                );
+              }}
+            >
+              Submit Suggestion
+            </Button>
+            <Button
+              key={`cancel-suggestion`}
+              variant="outlined"
+              onClick={() => {
+                setAccusationRoom("");
+                setSuggestionSuspect("");
+                setSuggestionWeapon("");
+              }}
+            >
+              Cancel Suggestion
+            </Button>
+          </div>
+          <div className={styles.submission}></div>
         </div>
       )}
 
       {gameState.game_phase === 1 && action == "accusation" && (
         <div className={styles.accusation}>
-          <div className={styles.column}>
-            <b>Select Character</b>
-            <br></br>
-            {suspects.map((suspect) => (
-              <Button
-                key={`suspect-${suspect}`}
-                variant="outlined"
-                onClick={() => {
-                  // todo
+          <div className={styles.controls}>
+            <FormControl sx={{ minWidth: 160 }}>
+              <InputLabel id="accusation-suspect-selection-label">
+                Select Suspect
+              </InputLabel>
+              <Select
+                labelId="accusation-suspect-selection-label"
+                id="accusation-suspect-selection"
+                value={accusationSuspect}
+                label="Suspect"
+                onChange={(event) => {
+                  setAccusationSuspect(event.target.value);
                 }}
               >
-                {suspect}
-              </Button>
-            ))}
-          </div>
-          <div className={styles.column}>
-            <b>Select Weapon</b>
-            <br></br>
-            {weapons.map((weapon) => (
-              <Button
-                key={`weapon-${weapon}`}
-                variant="outlined"
-                onClick={() => {
-                  // todo
+                {suspects.map((suspect) => (
+                  <MenuItem key={suspect} value={suspect}>
+                    {formatLabel(suspect)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            <FormControl sx={{ minWidth: 160 }}>
+              <InputLabel id="accusation-weapon-selection-label">
+                Select Weapon
+              </InputLabel>
+              <Select
+                labelId="accusation-weapon-selection-label"
+                id="accusation-weapon-selection"
+                value={accusationWeapon}
+                label="Weapon"
+                onChange={(event) => {
+                  setAccusationWeapon(event.target.value);
                 }}
               >
-                {weapon}
-              </Button>
-            ))}
-          </div>
-          <div className={styles.column}>
-            <b>Select Room</b>
-            <br></br>
-            {rooms.map((room) => (
-              <Button
-                key={`room-${room}`}
-                variant="outlined"
-                onClick={() => {
-                  // todo
+                {weapons.map((weapon) => (
+                  <MenuItem key={weapon} value={weapon}>
+                    {formatLabel(weapon)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            <FormControl sx={{ minWidth: 160 }}>
+              <InputLabel id="accusation-room-selection-label">
+                Select Room
+              </InputLabel>
+              <Select
+                labelId="accusation-room-selection-label"
+                id="accusation-room-selection"
+                value={accusationRoom}
+                label="Room"
+                onChange={(event) => {
+                  setAccusationRoom(event.target.value);
                 }}
               >
-                {room}
-              </Button>
-            ))}
+                {rooms.map((room) => (
+                  <MenuItem key={room} value={room}>
+                    {formatLabel(room)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </div>
-          <Button
-            key={`submit-accusation`}
-            variant="outlined"
-            onClick={() => {
-              websocket?.current?.send(
-                JSON.stringify({
-                  type: "accusation",
-                  suspect: "miss_scarlet",
-                  room: "study",
-                  weapon: "rope",
-                })
-              );
-            }}
-          >
-            Submit Accusation
-          </Button>
+          <div className={styles.submission}>
+            <Button
+              key={`submit-accusation`}
+              variant="contained"
+              onClick={() => {
+                websocket?.current?.send(
+                  JSON.stringify({
+                    type: "accusation",
+                    suspect: accusationSuspect,
+                    room: accusationRoom,
+                    weapon: accusationWeapon,
+                  })
+                );
+              }}
+            >
+              Submit Accusation
+            </Button>
+            <Button
+              key={`cancel-accusation`}
+              variant="outlined"
+              onClick={() => {
+                setAccusationRoom("");
+                setAccusationSuspect("");
+                setAccusationWeapon("");
+              }}
+            >
+              Cancel Accusation
+            </Button>
+          </div>
         </div>
+      )}
+
+      {gameState.game_phase === 2 && (
+        <div>Game Over! {formatLabel(gameState?.winner)} won!</div>
       )}
     </div>
   );
