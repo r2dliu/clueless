@@ -64,6 +64,8 @@ function Board() {
   const [suggestionWeapon, setSuggestionWeapon] = useState("");
   const [suggestionRoom, setSuggestionRoom] = useState("");
 
+  const [isControlsLocked, setIsControlsLocked] = useState(true);
+
   useEffect(() => {
     if (websocket.current) {
       websocket.current.addEventListener("message", (message) => {
@@ -93,6 +95,12 @@ function Board() {
       console.log(gameState?.previous_move);
       setHistory((history) => [...history, gameState?.previous_move]);
     }
+
+    // toggle controls lock
+    if (gameState?.current_turn && gameState?.assignments[clientId])
+      setIsControlsLocked(
+        gameState.current_turn != gameState.assignments[clientId]
+      );
   }, [gameState]);
 
   function formatLabel(label) {
@@ -110,9 +118,11 @@ function Board() {
       {/* message dump */}
       <div>{`you are: ${clientId}`}</div>
       <div>{`gameid: ${gameId}`}</div>
-      <div className={styles.state}>{`gamestate: ${JSON.stringify(
-        gameState
-      )}`}</div>
+      {/*
+        <div className={styles.state}>{`gamestate: ${JSON.stringify(
+          gameState
+        )}`}</div>
+      */}
 
       {history.map((action) => (
         <Chip label={action} variant="outlined" key={action} />
@@ -174,6 +184,7 @@ function Board() {
             onClick={() => {
               setAction("move");
             }}
+            disabled={isControlsLocked}
           >
             Move
           </Button>
@@ -183,6 +194,7 @@ function Board() {
             onClick={() => {
               setAction("suggestion");
             }}
+            disabled={isControlsLocked}
           >
             Make Suggestion
           </Button>
@@ -192,6 +204,7 @@ function Board() {
             onClick={() => {
               setAction("accusation");
             }}
+            disabled={isControlsLocked}
           >
             Make Accusation
           </Button>
@@ -214,6 +227,7 @@ function Board() {
                   })
                 );
               }}
+              disabled={isControlsLocked}
             >
               {move}
             </Button>
@@ -236,6 +250,7 @@ function Board() {
                 onChange={(event) => {
                   setSuggestionSuspect(event.target.value);
                 }}
+                disabled={isControlsLocked}
               >
                 {suspects.map((suspect) => (
                   <MenuItem key={suspect} value={suspect}>
@@ -257,6 +272,7 @@ function Board() {
                 onChange={(event) => {
                   setSuggestionWeapon(event.target.value);
                 }}
+                disabled={isControlsLocked}
               >
                 {weapons.map((weapon) => (
                   <MenuItem key={weapon} value={weapon}>
@@ -278,6 +294,7 @@ function Board() {
                 onChange={(event) => {
                   setSuggestionRoom(event.target.value);
                 }}
+                disabled={isControlsLocked}
               >
                 {rooms.map((room) => (
                   <MenuItem key={room} value={room}>
@@ -301,6 +318,7 @@ function Board() {
                   })
                 );
               }}
+              disabled={isControlsLocked}
             >
               Submit Suggestion
             </Button>
@@ -312,6 +330,7 @@ function Board() {
                 setSuggestionSuspect("");
                 setSuggestionWeapon("");
               }}
+              disabled={isControlsLocked}
             >
               Cancel Suggestion
             </Button>
@@ -335,6 +354,7 @@ function Board() {
                 onChange={(event) => {
                   setAccusationSuspect(event.target.value);
                 }}
+                disabled={isControlsLocked}
               >
                 {suspects.map((suspect) => (
                   <MenuItem key={suspect} value={suspect}>
@@ -356,6 +376,7 @@ function Board() {
                 onChange={(event) => {
                   setAccusationWeapon(event.target.value);
                 }}
+                disabled={isControlsLocked}
               >
                 {weapons.map((weapon) => (
                   <MenuItem key={weapon} value={weapon}>
@@ -377,6 +398,7 @@ function Board() {
                 onChange={(event) => {
                   setAccusationRoom(event.target.value);
                 }}
+                disabled={isControlsLocked}
               >
                 {rooms.map((room) => (
                   <MenuItem key={room} value={room}>
@@ -400,6 +422,7 @@ function Board() {
                   })
                 );
               }}
+              disabled={isControlsLocked}
             >
               Submit Accusation
             </Button>
@@ -411,6 +434,7 @@ function Board() {
                 setAccusationSuspect("");
                 setAccusationWeapon("");
               }}
+              disabled={isControlsLocked}
             >
               Cancel Accusation
             </Button>
