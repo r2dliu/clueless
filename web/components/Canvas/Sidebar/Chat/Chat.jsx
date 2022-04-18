@@ -11,9 +11,16 @@ function Chat() {
   useEffect(() => {
     if (websocket.current) {
       websocket.current.addEventListener("message", (message) => {
-        console.log(message);
         const parsed_msg = JSON.parse(message?.data);
-        if (parsed_msg?.chat && parsed_msg?.clientId) {
+        if (!parsed_msg.type) {
+          // handle error, all messages should have type
+        }
+
+        if (
+          parsed_msg.type === "chat" &&
+          parsed_msg?.chat &&
+          parsed_msg?.clientId
+        ) {
           setMessages((prevMessages) => [
             ...prevMessages,
             `${parsed_msg.clientId} : ${parsed_msg.chat}`,
@@ -23,7 +30,6 @@ function Chat() {
     }
   }, [websocket]);
 
-  console.log(messages);
   return (
     <div>
       <b>chat</b>
@@ -38,6 +44,7 @@ function Chat() {
           if (e.key === "Enter" && !!chatInputRef.current.value) {
             websocket?.current?.send(
               JSON.stringify({
+                type: "chat",
                 chat: chatInputRef.current.value,
                 clientId: clientId,
               })

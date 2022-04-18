@@ -1,215 +1,291 @@
-import React, { useContext, useState, useRef, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { Button } from "@mui/material";
 import { GameContext } from "@/components/helpers/GameContext";
 import styles from "./Board.module.scss";
-import { Button } from "@mui/material";
 
 function Board() {
-  const [messages, setMessages] = useState([]);
   const { gameIdContext, clientIdContext, gameStateContext, websocket } =
     useContext(GameContext);
 
   const [gameId, _setGameId] = gameIdContext;
   const [clientId, _setClientId] = clientIdContext;
-  const [gameState, _setGameState] = gameStateContext;
-  const connections = {};
+  const [gameState, setGameState] = gameStateContext;
 
-  const gameStateRef = useRef();
-  const [startGameError, setStartGameError] = useState("");
+  const suspects = [
+    "colonel_mustard",
+    "miss_scarlet",
+    "professor_plum",
+    "mr_green",
+    "mrs_white",
+    "mrs_peacock",
+  ];
+
+  const rooms = [
+    "study",
+    "hall",
+    "lounge",
+    "library",
+    "billiard",
+    "dining",
+    "conservatory",
+    "ballroom",
+    "kitchen",
+  ];
+
+  const weapons = [
+    "rope",
+    "lead_pipe",
+    "knife",
+    "wrench",
+    "candlestick",
+    "revolver",
+  ];
+
+  const clientSuspect = (gameState?.assignments || {})[`${clientId}`];
+  const [action, setAction] = useState("");
+  const [accusation, currentAccusation] = useState({});
 
   useEffect(() => {
     if (websocket.current) {
-      websocket.current.addEventListener("state", (message) => {
+      websocket.current.addEventListener("message", (message) => {
         console.log(message);
-        const parsed_msg = JSON.parse(message?.data);
-        if (parsed_msg?.state && parsed_msg?.clientId) {
-          setMessages((prevMessages) => [
-            ...prevMessages,
-            `${parsed_msg.clientId} : ${parsed_msg.state}`,
-          ]);
+        const new_state = JSON.parse(message?.data);
+        console.log(new_state);
+        if (!new_state.type) {
+          console.log(new_state);
+          return;
+          // handle error, all messages should have type
+        }
+        console.log(new_state);
+        if (new_state.type === "state") {
+          setGameState((prevGameState) => {
+            return { ...prevGameState, ...new_state };
+          });
         }
       });
     }
   }, [websocket]);
 
-  const startGame = async () => {
-    console.log(`starting game with ${'placeholderLOL'}/6 players`);
-    const response = await fetch("/start_game", {
-      method: "GET", headers: {
-        "Content-type": "application/json"
-      }
-    });
-    if (!response.ok) {
-      setStartGameError(response.statusText);
-    } else {
-      const state = await response.json();
-      _setGameState(state);
-    }
-  };
-
-  // This is currently unused but meant to keep track of how many players are in the lobby
-  const updateLobby = async () => {
-    const response = await fetch("/get_connections");
-    if (!response.ok) {
-      setStartGameError(response.statusText);
-    } else {
-      const players = await response.json();
-      console.log(players);
-      connections = players;
-    }
-  };
-
-  // Define each button separately below so we can dynamically show or hide them
-  // Checks game_phase and assigns the div if the phase is correct, or a blank string if not
-  const characterSelection = (gameState.game_phase == 0) ? (
-    <div>
-      <b>Select Character</b><br></br>
-      {messages.map((message, i) => (
-        <p key={i}>{message}</p>
-      ))}
-      <Button
-        id="select_character"
-        variant="outlined"
-        onClick={() => {
-          websocket?.current?.send(
-            JSON.stringify({
-              clientId: clientId,
-              token: "miss_scarlet",
-            })
-          );
-        }}
-      >Miss Scarlet</Button>
-      <Button
-        id="select_character"
-        variant="outlined"
-        onClick={() => {
-          websocket?.current?.send(
-            JSON.stringify({
-              clientId: clientId,
-              token: "colonel_mustard",
-            })
-          );
-        }}
-      >Colonel Mustard</Button>
-      <Button
-        id="select_character"
-        variant="outlined"
-        onClick={() => {
-          websocket?.current?.send(
-            JSON.stringify({
-              clientId: clientId,
-              token: "professor_plum",
-            })
-          );
-        }}
-      >Professor Plum</Button>
-      <Button
-        id="select_character"
-        variant="outlined"
-        onClick={() => {
-          websocket?.current?.send(
-            JSON.stringify({
-              clientId: clientId,
-              token: "mr_green",
-            })
-          );
-        }}
-      >Mr. Green</Button>
-      <Button
-        id="select_character"
-        variant="outlined"
-        onClick={() => {
-          websocket?.current?.send(
-            JSON.stringify({
-              clientId: clientId,
-              token: "mrs_white",
-            })
-          );
-        }}
-      >Mrs. White</Button>
-      <Button
-        id="select_character"
-        variant="outlined"
-        onClick={() => {
-          websocket?.current?.send(
-            JSON.stringify({
-              clientId: clientId,
-              token: "mrs_peacock",
-            })
-          );
-        }}
-      >Mrs. Peacock</Button>
-    </div>
-  ) : "";
-
-  const button_startGame = (gameState.game_phase == 0) ? (
-    <div>
-      <b>Start Game</b>
-      {messages.map((message, i) => (
-        <p key={i}>{message}</p>
-      ))}
-      <Button
-        id="start_game"
-        variant="outlined"
-        onClick={startGame}
-      />
-    </div>
-  ) : "";
-
-  const button_makeMove = (gameState.game_phase == 1) ? (
-    <div>
-      <b>Make Move</b>
-      {messages.map((message, i) => (
-        <p key={i}>{message}</p>
-      ))}
-      <Button
-        id="make_move"
-        variant="outlined"
-        onClick={() => {
-          websocket?.current?.send(
-            JSON.stringify({
-              state: gameState,
-              clientId: clientId,
-            })
-          );
-        }}
-      />
-    </div>
-  ) : "";
-
-  const button_makeAccusation = (gameState.game_phase == 1) ? (
-    <div>
-      <b>Make Accusation</b>
-      {messages.map((message, i) => (
-        <p key={i}>{message}</p>
-      ))}
-      <Button
-        id="make_accusation"
-        variant="outlined"
-        onClick={() => {
-          websocket?.current?.send(
-            JSON.stringify({
-              state: gameState,
-              clientId: clientId,
-            })
-          );
-        }}
-      />
-    </div>
-  ) : "";
-
   return (
     <div className={styles.Board}>
       <div>{`you are: ${clientId}`}</div>
       <div>{`gameid: ${gameId}`}</div>
-      <div>{`state: ${JSON.stringify(gameState)}`}</div>
-      <div>{`players: ${JSON.stringify(connections)}`}</div>
+      <div className={styles.state}>{`gamestate: ${JSON.stringify(
+        gameState
+      )}`}</div>
 
-      {characterSelection}
-      {button_startGame}
-      {button_makeMove}
-      {button_makeAccusation}
+      {gameState.game_phase === 0 && (
+        <div>
+          <b>Select Character</b>
+          <br></br>
+          {suspects.map((suspect) => (
+            <Button
+              key={`suspect-${suspect}`}
+              variant="outlined"
+              onClick={() => {
+                websocket?.current?.send(
+                  JSON.stringify({
+                    type: "select_character",
+                    clientId: clientId,
+                    character_token: suspect,
+                  })
+                );
+              }}
+            >
+              {suspect}
+            </Button>
+          ))}
+        </div>
+      )}
+      <br />
+      <br />
+      {gameState.game_phase === 0 && (
+        <Button
+          id="start"
+          variant="outlined"
+          onClick={() => {
+            websocket?.current?.send(
+              JSON.stringify({
+                type: "start",
+              })
+            );
+          }}
+        >
+          Start Game
+        </Button>
+      )}
 
-    </div >
+      {gameState.game_phase === 1 && (
+        <div>
+          <Button
+            id="move"
+            variant="outlined"
+            onClick={() => {
+              setAction("move");
+            }}
+          >
+            Move
+          </Button>
+          <Button
+            id="suggestion"
+            variant="outlined"
+            onClick={() => {
+              setAction("suggestion");
+            }}
+          >
+            Make Suggestion
+          </Button>
+          <Button
+            id="accusation"
+            variant="outlined"
+            onClick={() => {
+              setAction("accusation");
+            }}
+          >
+            Make Accusation
+          </Button>
+        </div>
+      )}
+
+      {gameState.game_phase === 1 &&
+        action == "move" &&
+        (gameState?.allowed_moves || {})[clientSuspect].map((move) => {
+          return (
+            <Button
+              key="actual-move"
+              variant="outlined"
+              onClick={() => {
+                websocket?.current?.send(
+                  JSON.stringify({
+                    type: "move",
+                    suspect: clientSuspect,
+                    location: move,
+                  })
+                );
+              }}
+            >
+              {move}
+            </Button>
+          );
+        })}
+
+      {/* todo lots of repeatd code beneath, clean up */}
+      {gameState.game_phase === 1 && action == "suggestion" && (
+        <div className={styles.suggestion}>
+          <div className={styles.column}>
+            <b>Select Character</b>
+            <br></br>
+            {suspects.map((suspect) => (
+              <Button
+                key={`suspect-${suspect}`}
+                variant="outlined"
+                onClick={() => {
+                  // todo
+                }}
+              >
+                {suspect}
+              </Button>
+            ))}
+          </div>
+          <div className={styles.column}>
+            <b>Select Weapon</b>
+            <br></br>
+            {weapons.map((weapon) => (
+              <Button
+                key={`weapon-${weapon}`}
+                variant="outlined"
+                onClick={() => {
+                  // todo
+                }}
+              >
+                {weapon}
+              </Button>
+            ))}
+          </div>
+          <div className={styles.column}>
+            <b>Select Room</b>
+            <br></br>
+            {rooms.map((room) => (
+              <Button
+                key={`room-${room}`}
+                variant="outlined"
+                onClick={() => {
+                  // todo
+                }}
+              >
+                {room}
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {gameState.game_phase === 1 && action == "accusation" && (
+        <div className={styles.accusation}>
+          <div className={styles.column}>
+            <b>Select Character</b>
+            <br></br>
+            {suspects.map((suspect) => (
+              <Button
+                key={`suspect-${suspect}`}
+                variant="outlined"
+                onClick={() => {
+                  // todo
+                }}
+              >
+                {suspect}
+              </Button>
+            ))}
+          </div>
+          <div className={styles.column}>
+            <b>Select Weapon</b>
+            <br></br>
+            {weapons.map((weapon) => (
+              <Button
+                key={`weapon-${weapon}`}
+                variant="outlined"
+                onClick={() => {
+                  // todo
+                }}
+              >
+                {weapon}
+              </Button>
+            ))}
+          </div>
+          <div className={styles.column}>
+            <b>Select Room</b>
+            <br></br>
+            {rooms.map((room) => (
+              <Button
+                key={`room-${room}`}
+                variant="outlined"
+                onClick={() => {
+                  // todo
+                }}
+              >
+                {room}
+              </Button>
+            ))}
+          </div>
+          <Button
+            key={`submit-accusation`}
+            variant="outlined"
+            onClick={() => {
+              websocket?.current?.send(
+                JSON.stringify({
+                  type: "accusation",
+                  suspect: "miss_scarlet",
+                  room: "study",
+                  weapon: "rope",
+                })
+              );
+            }}
+          >
+            Submit Accusation
+          </Button>
+        </div>
+      )}
+    </div>
   );
 }
 

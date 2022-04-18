@@ -1,6 +1,6 @@
 # from typing import Optional
 
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from connection_manager import ConnectionManager
 from uuid import UUID, uuid4
 import json
@@ -30,84 +30,58 @@ def read_root():
 @app.get("/new_game")
 def create_game():
     id = uuid4()
-    games_by_id[id] = Clueless(connection_manager)
-    return id, json.dumps(games_by_id[id].get_game_state())
-
-
-# FIXME: Had trouble with {id} part of route so just having
-# it return the game state of the only game we have running
-# to test board
-# @app.get("/start_game/{id}")
-# def start_game(id: str):
-@app.get("/start_game")
-def start_game():
-    # start game and return initial state
-    try:
-        # return json.dumps(games_by_id[id].initialize_board())
-        return json.dumps(games_by_id[0].initialize_board())
-    except KeyError:
-        # game wasn't created?
-        # games_by_id[id] = Clueless(connection_manager)
-        # return json.dumps(games_by_id[id].initialize_board())
-        games_by_id[0] = Clueless(connection_manager)
-        return json.dumps(games_by_id[0].initialize_board())
-
-
-@app.get("/get_connections")
-def get_connections(id: str):
-    return json.dumps(games_by_id[id].get_connections())
-
-
-@app.get("/get_state/")
-def get_state(id: str):
-    # query clueless for current state
-    return json.dumps(games_by_id[id].get_game_state())
-
-
-@app.put("/update_state")
-def update_state(id: str, state: str):
-    # updates global game state with client's changes and returns new state
-    games_by_id[id].state = json.loads(state)
-    return games_by_id[id].get_game_state()
-
-
-@app.get("/allowed_moves")
-def get_allowed_moves(id: str, player: str):
-    # return list of allowed moves for a given player
-    return json.dumps(games_by_id[id].allowed_moves(player))
-
-
-@app.get("/verify_accusation")
-def verify_accusation(id: str, accusation: str):
-    # check if client's accusation is correct
-    return json.dumps(games_by_id[id].verify_accusation(accusation))
+    # Bug here: it is reusing the same class somehow instead of generating
+    # a new instance
+    game = Clueless(connection_manager)
+    games_by_id[id] = game
+    return id
 
 
 @app.websocket("/ws/{game_uuid}/{client_uuid}")
 async def websocket_connection(websocket: WebSocket, game_uuid: str,
                                client_uuid: str):
     if UUID(game_uuid) in games_by_id:
+        game = games_by_id[UUID(game_uuid)]
+
         if connection_manager.has_existing_connection(client_uuid):
             # this username already exists in game, prevent connection
             await websocket.close(code=409)
             return
 
         await connection_manager.connect(client_uuid, websocket)
+        # Successfully connected websocket!
 
         try:
             while True:
+                message = game.get_state()
+                clientSuspect = message["assignments"].get(client_uuid, "")
+                print(message)
+                message["type"] = "state"
+                await connection_manager.broadcast(message)
                 data = await websocket.receive_json()
                 print("wow got message")
                 print(data)
-                await connection_manager.broadcast(data)
-
-                if ("token" in data.keys()):
-                    status = connection_manager.assign_character(data['clientId'], data['token'])
-                    if status:
-                        print(f"assigned player {data['clientId']} to token {data['token']}")
-                    else:
-                        print("todo token already claimed, grey out button or something")
-                    print(connection_manager.get_players())
+                # ignore message without 'type' key
+                # all messages must have a type
+                if "type" in data:
+                    if (data["type"] == "chat"):
+                        # chat messages are forwarded to everyone
+                        await connection_manager.broadcast(data)
+                    elif (data["type"] == "start"):
+                        game.initialize_board()
+                    elif (data["type"] == "select_character"):
+                        connection_manager.assign_character(
+                            client_uuid, data["character_token"])
+                    elif (data["type"] == "move"):
+                        game.move(data["suspect"], data["location"])
+                    elif (data["type"] == "accusation"):
+                        data.pop("type")
+                        game.make_accusation(clientSuspect, data)
+                    # handle other types of messages
+                    # pick character
+                    # move
+                    # accusation
+                    # etc
 
         except WebSocketDisconnect:
             connection_manager.disconnect(client_uuid)

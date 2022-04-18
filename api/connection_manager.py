@@ -6,7 +6,7 @@ class ConnectionManager:
 
     def __init__(self):
         self.active_connections: dict[str, WebSocket] = {}
-        self.id_to_char: dict[str, str] = {}  #map client id: chosen character
+        self.id_to_char: dict[str, str] = {}
 
     def has_existing_connection(self, uuid):
         return True if uuid in self.active_connections else False
@@ -34,5 +34,8 @@ class ConnectionManager:
             return False
 
     def get_players(self):
-        """ Returns list of current player's selected characters """
+        """ Returns list of current players' selected characters """
         return list(self.id_to_char.values())
+
+    def get_assignments(self):
+        return self.id_to_char
