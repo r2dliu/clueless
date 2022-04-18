@@ -6,4 +6,18 @@
   align-items: center;
   height: min(100vw - 300px, 100vh);
   width: min(100vw - 300px, 100vh);
+
+  .state {
+    width: 50%;
+    overflow-wrap: anywhere;
+  }
+
+  .accusation,
+  .suggestion {
+    display: flex;
+    .column {
+      display: flex;
+      flex-direction: column;
+    }
+  }
 }
