@@ -92,6 +92,8 @@ class Clueless:
             "turn_order": [],  # player turn order
             "current_turn": "miss_scarlet",  # player token
             "suggestion": {},  # holds current suggestion players must disprove
+            "winner": {},  # holds the winner of the game
+            "previous_move": {},  # holds the previous move for minimal demo
         }
 
     def get_game_state(self):
@@ -309,13 +311,16 @@ class Clueless:
               concealed case file
         """
         if (accusation == self.state["concealed_scenario"]):
+            self.state["winner"] = player
             self.state["game_phase"] = GamePhase.COMPLETED.value
         else:
+            self.state["previous_move"] = player + " made an incorrect accusation"
             self.rotate_next_player(player)
             self.state["turn_order"].remove(player)
 
     def move(self, player: str, location: str) -> Dict:
         if location in self.allowed_moves(player):
+            self.state["previous_move"] = player + " moved to " + location
             self.state["suspect_locations"][player] = location
             self.rotate_next_player(player)
         # else:
