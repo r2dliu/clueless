@@ -32,18 +32,11 @@ function MainMenu() {
     }
 
     console.log("creating new game");
-    const response = await fetch("/new_game", {
-      method: "GET", headers: {
-        "Content-type": "application/json"
-      }
-    });
+    const response = await fetch("/new_game");
     if (!response.ok) {
       setNewGameError(response.statusText);
     } else {
-      const responseJSON = await response.json();
-      console.log(responseJSON);
-      const newGameId = responseJSON[0];
-      const newGameState = responseJSON[1];
+      const newGameId = await response.json();
       const new_websocket = new WebSocket(
         `ws://localhost:8000/ws/${newGameId}/${userNameFieldRef.current.value}`
       );
@@ -62,14 +55,13 @@ function MainMenu() {
         console.log("ws closed");
       };
       new_websocket.onmessage = (message) => {
-        console.log(`got message: ${JSON.stringify(message)}`);
+        console.log(`got message: ${message}`);
       };
 
       // setting gameId must come last, because it makes main menu unmount
       // and causes board to mount in it's place
       setClientId(userNameFieldRef.current.value);
       setGameId(newGameId);
-      setGameState(JSON.parse(newGameState));
     }
   };
 
