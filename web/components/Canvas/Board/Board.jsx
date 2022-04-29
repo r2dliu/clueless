@@ -1,6 +1,8 @@
+
 import React, { useContext, useEffect, useState } from "react";
 import {
   Button,
+  Box,
   FormControl,
   InputLabel,
   MenuItem,
@@ -10,6 +12,7 @@ import {
 import formatLabel from "@/components/helpers/utils";
 import { GameContext } from "@/components/helpers/GameContext";
 import styles from "./Board.module.scss";
+
 
 function Board() {
   const { gameIdContext, clientIdContext, gameStateContext, websocket } =
@@ -127,15 +130,50 @@ function Board() {
         </Button>
       )}
 
+      {/* display board */}
       {gameState.game_phase === 1 && (
-        <b>It is {formatLabel(gameState.current_turn)}&apos;s turn</b>
-      )}
+        <div>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: { xs: 'column', md: 'row' },
+              alignItems: 'center',
+              bgcolor: 'background.paper',
+              overflow: 'hidden',
+              borderRadius: '12px',
+              boxShadow: 1,
+              fontWeight: 'bold',
+            }}
+          >
+            <Box
+              component="img"
+              sx={{
+                height: '100%',
+                width: '100%',
+                objectFit: 'cover'
+              }}
+              src={"/static/board.png"}
+              alt="board"
+            >
+            </Box>
+          </Box>
+        </div>
+      )
+      }
+
+      {
+        gameState.game_phase === 1 && (
+          <b>It is {formatLabel(gameState.current_turn)}&apos;s turn</b>
+        )
+      }
 
 
-      {gameState.game_phase === 2 && (
-        <div>Game Over! {formatLabel(gameState?.winner)} won!</div>
-      )}
-    </div>
+      {
+        gameState.game_phase === 2 && (
+          <div>Game Over! {formatLabel(gameState?.winner)} won!</div>
+        )
+      }
+    </div >
   );
 }
 
