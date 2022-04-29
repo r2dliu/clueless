@@ -10,6 +10,8 @@ function Sidebar() {
     <div className={styles.Sidebar}>
       <div>
         <Chat />
+        <br></br>
+        <br></br>
         <Controls />
       </div>
     </div>

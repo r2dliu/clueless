@@ -1,15 +1,17 @@
 import React, { useState, useEffect, useContext } from "react";
 import {
     Button,
+    ButtonGroup,
     FormControl,
     InputLabel,
     MenuItem,
     Select,
-    Chip,
+
 } from "@mui/material";
 import formatLabel from "@/components//helpers/utils";
 import { GameContext } from "@/components/helpers/GameContext";
 import styles from "../Sidebar.module.scss";
+
 
 function Controls() {
     const { gameIdContext, clientIdContext, gameStateContext, websocket } =
@@ -50,6 +52,7 @@ function Controls() {
     ];
 
     const clientSuspect = (gameState?.assignments || {})[`${clientId}`];
+    const currentRoom = (gameState?.suspect_locations || {})[clientSuspect];
     const [action, setAction] = useState("");
     const [accusation, currentAccusation] = useState({});
 
@@ -63,7 +66,6 @@ function Controls() {
     const [suggestionRoom, setSuggestionRoom] = useState("");
 
     const [isControlsLocked, setIsControlsLocked] = useState(true);
-
 
     useEffect(() => {
         // toggle controls lock
@@ -81,36 +83,45 @@ function Controls() {
             {
                 gameState.game_phase === 1 && (
                     <div>
-                        <Button
-                            id="move"
-                            variant="outlined"
-                            onClick={() => {
-                                setAction("move");
-                            }}
-                            disabled={isControlsLocked}
+                        <ButtonGroup
+                            orientation="vertical"
                         >
-                            Move
-                        </Button>
-                        <Button
-                            id="suggestion"
-                            variant="outlined"
-                            onClick={() => {
-                                setAction("suggestion");
-                            }}
-                            disabled={isControlsLocked}
-                        >
-                            Make Suggestion
-                        </Button>
-                        <Button
-                            id="accusation"
-                            variant="outlined"
-                            onClick={() => {
-                                setAction("accusation");
-                            }}
-                            disabled={isControlsLocked}
-                        >
-                            Make Accusation
-                        </Button>
+                            <Button
+                                id="move"
+                                variant="contained"
+                                onClick={() => {
+                                    setAction("move");
+                                }}
+                                disabled={isControlsLocked}
+                                size="large"
+                            >
+                                Move
+                            </Button>
+                            <Button
+                                id="suggestion"
+                                variant="contained"
+                                onClick={() => {
+                                    setAction("suggestion");
+                                }}
+                                disabled={isControlsLocked
+                                    || currentRoom.includes('start') //cant make suggestion on turn one
+                                    || !rooms.includes(currentRoom)} //cant make suggestion if not in a room
+                                size="large"
+                            >
+                                Make Suggestion
+                            </Button>
+                            <Button
+                                id="accusation"
+                                variant="contained"
+                                onClick={() => {
+                                    setAction("accusation");
+                                }}
+                                disabled={isControlsLocked}
+                                size="large"
+                            >
+                                Make Accusation
+                            </Button>
+                        </ButtonGroup>
                     </div>
                 )
             }
@@ -138,6 +149,8 @@ function Controls() {
                     );
                 })
             }
+
+
             {/* todo lots of repeated code beneath, clean up */}
             {gameState.game_phase === 1 && action == "suggestion" && (
                 <div className={styles.suggestion}>
@@ -200,11 +213,9 @@ function Controls() {
                                 }}
                                 disabled={isControlsLocked}
                             >
-                                {rooms.map((room) => (
-                                    <MenuItem key={room} value={room}>
-                                        {formatLabel(room)}
-                                    </MenuItem>
-                                ))}
+                                <MenuItem key={currentRoom} value={currentRoom}>
+                                    {formatLabel(currentRoom)}
+                                </MenuItem>
                             </Select>
                         </FormControl>
                     </div>
@@ -230,7 +241,7 @@ function Controls() {
                             key={`cancel-suggestion`}
                             variant="outlined"
                             onClick={() => {
-                                setAccusationRoom("");
+                                setSuggestionRoom("");
                                 setSuggestionSuspect("");
                                 setSuggestionWeapon("");
                             }}
@@ -242,6 +253,8 @@ function Controls() {
                     <div className={styles.submission}></div>
                 </div>
             )}
+
+
 
             {gameState.game_phase === 1 && action == "accusation" && (
                 <div className={styles.accusation}>
