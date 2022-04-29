@@ -8,6 +8,7 @@ function Chat() {
     useContext(GameContext);
   const [clientId, _setClientId] = clientIdContext;
   const chatInputRef = useRef();
+
   useEffect(() => {
     if (websocket.current) {
       websocket.current.addEventListener("message", (message) => {

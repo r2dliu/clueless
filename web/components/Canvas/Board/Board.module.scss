@@ -12,12 +12,4 @@
     overflow-wrap: anywhere;
   }
 
-  .accusation,
-  .suggestion {
-    display: flex;
-    .column {
-      display: flex;
-      flex-direction: column;
-    }
-  }
 }
