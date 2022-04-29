@@ -7,7 +7,7 @@ import {
   Select,
   Chip,
 } from "@mui/material";
-import formatLabel from "@/components//helpers/utils";
+import formatLabel from "@/components/helpers/utils";
 import { GameContext } from "@/components/helpers/GameContext";
 import styles from "./Board.module.scss";
 
