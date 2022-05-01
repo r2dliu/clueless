@@ -296,6 +296,7 @@ class Clueless:
         return next_player
 
     def rotate_next_player(self, player: str) -> str:
+        self.state["previous_move"] = player + " ended_turn"
         self.state["current_turn"] = self.get_next_player(player)
         return self.state["current_turn"]
 
