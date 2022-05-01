@@ -135,8 +135,8 @@ function MainMenu() {
             variant="standard"
           />
           <div className={styles.button}>
-            <Button variant="contained" onClick={joinGame}>
-              Join Game
+            <Button>
+            <img src={require('../../../../api/static/suspects.jpg')} alt="characters" onClick={joinGame} />
             </Button>
           </div>
           {/* todo show error if unable to join */}
