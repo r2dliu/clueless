@@ -296,6 +296,7 @@ class Clueless:
         return next_player
 
     def rotate_next_player(self, player: str) -> str:
+        self.state["previous_move"] = player + " ended_turn"
         self.state["current_turn"] = self.get_next_player(player)
         return self.state["current_turn"]
 
@@ -322,6 +323,6 @@ class Clueless:
         if location in self.allowed_moves(player):
             self.state["previous_move"] = player + " moved to " + location
             self.state["suspect_locations"][player] = location
-            self.rotate_next_player(player)
+            #self.rotate_next_player(player)
         # else:
         # todo return error?

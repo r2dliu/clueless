@@ -53,6 +53,7 @@ function Controls() {
 
     const clientSuspect = (gameState?.assignments || {})[`${clientId}`];
     const currentRoom = (gameState?.suspect_locations || {})[clientSuspect];
+    const previousMove = gameState?.previous_move;
     const [action, setAction] = useState("");
     const [accusation, currentAccusation] = useState({});
 
@@ -92,7 +93,8 @@ function Controls() {
                                 onClick={() => {
                                     setAction("move");
                                 }}
-                                disabled={isControlsLocked}
+                                disabled={isControlsLocked
+                                    || String(previousMove).includes(clientSuspect)}
                                 size="large"
                             >
                                 Move
@@ -120,6 +122,17 @@ function Controls() {
                                 size="large"
                             >
                                 Make Accusation
+                            </Button>
+                            <Button
+                                id="end_turn"
+                                variant="contained"
+                                onClick={() => {
+                                    setAction("end_turn");
+                                }}
+                                disabled={isControlsLocked}
+                                size="large"
+                            >
+                                End Turn
                             </Button>
                         </ButtonGroup>
                     </div>
@@ -150,6 +163,22 @@ function Controls() {
                 })
             }
 
+            {gameState.game_phase === 1 && action == "end_turn" && (
+                <Button
+                key="end_turn"
+                variant="outlined"
+                onClick={() => {
+                    websocket?.current?.send(
+                    JSON.stringify({
+                        type: "end_turn",
+                    })
+                    );
+                }}
+                disabled={isControlsLocked}
+                >
+                    Submit
+                </Button>
+            )}
 
             {/* todo lots of repeated code beneath, clean up */}
             {gameState.game_phase === 1 && action == "suggestion" && (
