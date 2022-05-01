@@ -56,6 +56,9 @@ function Board() {
             return { ...prevGameState, ...new_state };
           });
         }
+        else if (new_state.type === "turn_error") {
+          alert("Error: It is not your turn!");
+        }
       });
     }
   }, [websocket]);
