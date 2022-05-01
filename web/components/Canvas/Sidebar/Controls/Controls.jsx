@@ -154,6 +154,7 @@ function Controls() {
                                         location: move,
                                     })
                                 );
+                                setAction("");
                             }}
                             disabled={isControlsLocked}
                         >
@@ -165,16 +166,16 @@ function Controls() {
 
             {gameState.game_phase === 1 && action == "end_turn" && (
                 <Button
-                key="end_turn"
-                variant="outlined"
-                onClick={() => {
-                    websocket?.current?.send(
-                    JSON.stringify({
-                        type: "end_turn",
-                    })
-                    );
-                }}
-                disabled={isControlsLocked}
+                    key="end_turn"
+                    variant="outlined"
+                    onClick={() => {
+                        websocket?.current?.send(
+                            JSON.stringify({
+                                type: "end_turn",
+                            })
+                        );
+                    }}
+                    disabled={isControlsLocked}
                 >
                     Submit
                 </Button>
@@ -276,7 +277,7 @@ function Controls() {
                             }}
                             disabled={isControlsLocked}
                         >
-                            Cancel Suggestion
+                            Clear Suggestion
                         </Button>
                     </div>
                     <div className={styles.submission}></div>
@@ -382,7 +383,7 @@ function Controls() {
                             }}
                             disabled={isControlsLocked}
                         >
-                            Cancel Accusation
+                            Clear Accusation
                         </Button>
                     </div>
                 </div>
