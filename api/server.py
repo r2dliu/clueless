@@ -114,6 +114,10 @@ async def websocket_connection(websocket: WebSocket, game_uuid: str,
                             await connection_manager.send_personal_message(
                                 json.dumps({"type": "turn_error"}), websocket)
 
+                    # End turn
+                    elif (data["type"] == "end_turn"):
+                        game.rotate_next_player(clientSuspect)
+
                     # handle other types of messages
                     # pick character
                     # move
