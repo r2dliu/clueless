@@ -61,22 +61,56 @@ async def websocket_connection(websocket: WebSocket, game_uuid: str,
                 data = await websocket.receive_json()
                 print("wow got message")
                 print(data)
+
                 # ignore message without 'type' key
                 # all messages must have a type
                 if "type" in data:
+
+                    # Chat messages
                     if (data["type"] == "chat"):
                         # chat messages are forwarded to everyone
                         await connection_manager.broadcast(data)
+
+                    # Start game
                     elif (data["type"] == "start"):
                         game.initialize_board()
+
+                    # Character select assignments
                     elif (data["type"] == "select_character"):
                         connection_manager.assign_character(
                             client_uuid, data["character_token"])
+
+                    # Player move
                     elif (data["type"] == "move"):
-                        game.move(data["suspect"], data["location"])
+                        if (validate_turn_order(message, clientSuspect)):
+                            game.move(data["suspect"], data["location"])
+
+                            ### uncomment to see turn error message on a valid turn
+                            # await connection_manager.send_personal_message(
+                            #    json.dumps({"type": "turn_error"}), websocket)
+                            ###
+                        else:
+                            await connection_manager.send_personal_message(
+                                json.dumps({"type": "turn_error"}), websocket)
+
+                    # Player accusation
                     elif (data["type"] == "accusation"):
-                        data.pop("type")
-                        game.make_accusation(clientSuspect, data)
+                        if (validate_turn_order(message, clientSuspect)):
+                            data.pop("type")
+                            game.make_accusation(clientSuspect, data)
+                        else:
+                            await connection_manager.send_personal_message(
+                                json.dumps({"type": "turn_error"}), websocket)
+
+                    # Player suggestion
+                    elif (data["type"] == "suggestion"):
+                        if (validate_turn_order(message, clientSuspect)):
+                            # Handle suggestion
+                            pass
+                        else:
+                            await connection_manager.send_personal_message(
+                                json.dumps({"type": "turn_error"}), websocket)
+
                     # handle other types of messages
                     # pick character
                     # move
@@ -90,3 +124,7 @@ async def websocket_connection(websocket: WebSocket, game_uuid: str,
     else:
         # this game doesn't exist
         await websocket.close(code=404)
+
+
+def validate_turn_order(message, clientSuspect):
+    return (message["current_turn"] == clientSuspect)
