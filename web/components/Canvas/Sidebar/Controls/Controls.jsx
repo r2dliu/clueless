@@ -154,6 +154,7 @@ function Controls() {
                                         location: move,
                                     })
                                 );
+                                setAction("");
                             }}
                             disabled={isControlsLocked}
                         >
