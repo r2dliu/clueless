@@ -121,6 +121,17 @@ function Controls() {
                             >
                                 Make Accusation
                             </Button>
+                            <Button
+                                id="end_turn"
+                                variant="contained"
+                                onClick={() => {
+                                    setAction("end_turn");
+                                }}
+                                disabled={isControlsLocked}
+                                size="large"
+                            >
+                                End Turn
+                            </Button>
                         </ButtonGroup>
                     </div>
                 )
@@ -150,6 +161,21 @@ function Controls() {
                 })
             }
 
+            {gameState.game_phase === 1 && action == "end_turn" (
+                <Button
+                key="end_turn"
+                variant="outlined"
+                onClick={() => {
+                    websocket?.current?.send(
+                    JSON.stringify({
+                        type: "end_turn",
+                    })
+                    );
+                }}
+                disabled={isControlsLocked}
+                >
+                </Button>
+            )}
 
             {/* todo lots of repeated code beneath, clean up */}
             {gameState.game_phase === 1 && action == "suggestion" && (

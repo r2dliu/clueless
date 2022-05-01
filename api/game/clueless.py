@@ -322,6 +322,6 @@ class Clueless:
         if location in self.allowed_moves(player):
             self.state["previous_move"] = player + " moved to " + location
             self.state["suspect_locations"][player] = location
-            self.rotate_next_player(player)
+            #self.rotate_next_player(player)
         # else:
         # todo return error?

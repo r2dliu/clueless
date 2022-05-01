@@ -77,6 +77,8 @@ async def websocket_connection(websocket: WebSocket, game_uuid: str,
                     elif (data["type"] == "accusation"):
                         data.pop("type")
                         game.make_accusation(clientSuspect, data)
+                    elif (data["type"] == "end_turn"):
+                        game.rotate_next_player(clientSuspect)
                     # handle other types of messages
                     # pick character
                     # move
