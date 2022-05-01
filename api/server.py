@@ -82,7 +82,8 @@ async def websocket_connection(websocket: WebSocket, game_uuid: str,
 
                     # Player move
                     elif (data["type"] == "move"):
-                        if (validate_turn_order(message, clientSuspect)):
+                        # Validate turn order
+                        if (message["current_turn"] == clientSuspect):
                             game.move(data["suspect"], data["location"])
 
                             ### uncomment to see turn error message on a valid turn
@@ -95,7 +96,8 @@ async def websocket_connection(websocket: WebSocket, game_uuid: str,
 
                     # Player accusation
                     elif (data["type"] == "accusation"):
-                        if (validate_turn_order(message, clientSuspect)):
+                        # Validate turn order
+                        if (message["current_turn"] == clientSuspect):
                             data.pop("type")
                             game.make_accusation(clientSuspect, data)
                         else:
@@ -104,7 +106,8 @@ async def websocket_connection(websocket: WebSocket, game_uuid: str,
 
                     # Player suggestion
                     elif (data["type"] == "suggestion"):
-                        if (validate_turn_order(message, clientSuspect)):
+                        # Validate turn order
+                        if (message["current_turn"] == clientSuspect):
                             # Handle suggestion
                             pass
                         else:
@@ -124,7 +127,3 @@ async def websocket_connection(websocket: WebSocket, game_uuid: str,
     else:
         # this game doesn't exist
         await websocket.close(code=404)
-
-
-def validate_turn_order(message, clientSuspect):
-    return (message["current_turn"] == clientSuspect)
