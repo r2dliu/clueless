@@ -68,6 +68,11 @@ function Controls() {
     const [accusationWeapon, setAccusationWeapon] = useState("");
     const [accusationRoom, setAccusationRoom] = useState("");
 
+    const [suggestionErrors, setSuggetsionErrors] = useState({
+        "room": false,
+        "weapon": false,
+        "suspect": false
+    })
     const [suggestionSuspect, setSuggestionSuspect] = useState("");
     const [suggestionWeapon, setSuggestionWeapon] = useState("");
     const [suggestionRoom, setSuggestionRoom] = useState("");
@@ -89,6 +94,19 @@ function Controls() {
         if(!accusationRoom) isRoomValid = false;
         if(!accusationWeapon) isWeaponValid = false;
         setAccusationErrors({
+            "weapon" : !isWeaponValid,
+            "room" : !isRoomValid,
+            "suspect" : !isSuspectValid
+        })
+    }
+
+    function validateSuggestionFields() {
+        // only calling the hook once to avoid race condition
+        let isSuspectValid = true, isRoomValid = true, isWeaponValid = true;
+        if(!suggestionSuspect) isSuspectValid = false;
+        if(!suggestionRoom) isRoomValid = false;
+        if(!suggestionWeapon) isWeaponValid = false;
+        setSuggetsionErrors({
             "weapon" : !isWeaponValid,
             "room" : !isRoomValid,
             "suspect" : !isSuspectValid
@@ -214,6 +232,7 @@ function Controls() {
                                 onChange={(event) => {
                                     setSuggestionSuspect(event.target.value);
                                 }}
+                                error={suggestionErrors.suspect}
                                 disabled={isControlsLocked}
                             >
                                 {suspects.map((suspect) => (
@@ -236,6 +255,7 @@ function Controls() {
                                 onChange={(event) => {
                                     setSuggestionWeapon(event.target.value);
                                 }}
+                                error={suggestionErrors.weapon}
                                 disabled={isControlsLocked}
                             >
                                 {weapons.map((weapon) => (
@@ -258,6 +278,7 @@ function Controls() {
                                 onChange={(event) => {
                                     setSuggestionRoom(event.target.value);
                                 }}
+                                error={suggestionErrors.room}
                                 disabled={isControlsLocked}
                             >
                                 <MenuItem key={currentRoom} value={currentRoom}>
@@ -271,14 +292,19 @@ function Controls() {
                             key={`submit-suggestion`}
                             variant="contained"
                             onClick={() => {
-                                websocket?.current?.send(
-                                    JSON.stringify({
-                                        type: "suggestion",
-                                        suspect: suggestionSuspect,
-                                        room: suggestionRoom,
-                                        weapon: suggestionWeapon,
-                                    })
-                                );
+                                if(suggestionRoom && suggestionSuspect && suggestionWeapon) {
+                                    websocket?.current?.send(
+                                        JSON.stringify({
+                                            type: "suggestion",
+                                            suspect: suggestionSuspect,
+                                            room: suggestionRoom,
+                                            weapon: suggestionWeapon,
+                                        })
+                                    );
+                                }
+                                else {
+                                    validateSuggestionFields();
+                                }
                             }}
                             disabled={isControlsLocked}
                         >
@@ -291,6 +317,11 @@ function Controls() {
                                 setSuggestionRoom("");
                                 setSuggestionSuspect("");
                                 setSuggestionWeapon("");
+                                setSuggestionErrors({
+                                    "room": false,
+                                    "weapon": false,
+                                    "suspect": false
+                                });
                             }}
                             disabled={isControlsLocked}
                         >
