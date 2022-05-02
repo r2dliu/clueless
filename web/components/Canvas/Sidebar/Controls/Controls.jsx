@@ -404,6 +404,11 @@ function Controls() {
                                 setAccusationRoom("");
                                 setAccusationSuspect("");
                                 setAccusationWeapon("");
+                                setAccusationErrors({
+                                    "room": false,
+                                    "weapon": false,
+                                    "suspect": false
+                                });
                             }}
                             disabled={isControlsLocked}
                         >
