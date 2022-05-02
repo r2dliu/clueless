@@ -62,6 +62,7 @@ function Controls() {
         "weapon": false,
         "suspect": false
     })
+
     // todo clean these all up into a accusation and suggestion objects. using a single object was causing async issues
     const [accusationSuspect, setAccusationSuspect] = useState("");
     const [accusationWeapon, setAccusationWeapon] = useState("");
@@ -81,11 +82,7 @@ function Controls() {
             );
     }, [gameState]);
 
-    useEffect(() => {
-        validateAccusation();
-    }, [accusationWeapon, accusationRoom, accusationSuspect]);
-
-    function validateAccusation() {
+    function validateAccusationFields() {
         // only calling the hook once to avoid race condition
         let isSuspectValid = true, isRoomValid = true, isWeaponValid = true;
         if(!accusationSuspect) isSuspectValid = false;
@@ -393,7 +390,7 @@ function Controls() {
                                     })
                                   );
                                 } else {
-                                    validateAccusation()
+                                    validateAccusationFields()
                                 }
                             }}
                             disabled={isControlsLocked}
