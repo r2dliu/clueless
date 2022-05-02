@@ -57,6 +57,11 @@ function Controls() {
     const [action, setAction] = useState("");
     const [accusation, currentAccusation] = useState({});
 
+    const [accusationErrors, setAccusationErrors] = useState({
+        "room": false,
+        "weapon": false,
+        "suspect": false
+    })
     // todo clean these all up into a accusation and suggestion objects. using a single object was causing async issues
     const [accusationSuspect, setAccusationSuspect] = useState("");
     const [accusationWeapon, setAccusationWeapon] = useState("");
@@ -76,6 +81,22 @@ function Controls() {
             );
     }, [gameState]);
 
+    useEffect(() => {
+        validateAccusation();
+    }, [accusationWeapon, accusationRoom, accusationSuspect]);
+
+    function validateAccusation() {
+        // only calling the hook once to avoid race condition
+        let isSuspectValid = true, isRoomValid = true, isWeaponValid = true;
+        if(!accusationSuspect) isSuspectValid = false;
+        if(!accusationRoom) isRoomValid = false;
+        if(!accusationWeapon) isWeaponValid = false;
+        setAccusationErrors({
+            "weapon" : !isWeaponValid,
+            "room" : !isRoomValid,
+            "suspect" : !isSuspectValid
+        })
+    }
 
     return (
         <div>
@@ -301,6 +322,7 @@ function Controls() {
                                     setAccusationSuspect(event.target.value);
                                 }}
                                 disabled={isControlsLocked}
+                                error={accusationErrors.suspect}
                             >
                                 {suspects.map((suspect) => (
                                     <MenuItem key={suspect} value={suspect}>
@@ -323,6 +345,7 @@ function Controls() {
                                     setAccusationWeapon(event.target.value);
                                 }}
                                 disabled={isControlsLocked}
+                                error={accusationErrors.weapon}
                             >
                                 {weapons.map((weapon) => (
                                     <MenuItem key={weapon} value={weapon}>
@@ -345,6 +368,7 @@ function Controls() {
                                     setAccusationRoom(event.target.value);
                                 }}
                                 disabled={isControlsLocked}
+                                error={accusationErrors.room}
                             >
                                 {rooms.map((room) => (
                                     <MenuItem key={room} value={room}>
@@ -359,14 +383,18 @@ function Controls() {
                             key={`submit-accusation`}
                             variant="contained"
                             onClick={() => {
-                                websocket?.current?.send(
+                                if (accusationSuspect && accusationRoom && accusationWeapon) {
+                                  websocket?.current?.send(
                                     JSON.stringify({
-                                        type: "accusation",
-                                        suspect: accusationSuspect,
-                                        room: accusationRoom,
-                                        weapon: accusationWeapon,
+                                      type: "accusation",
+                                      suspect: accusationSuspect,
+                                      room: accusationRoom,
+                                      weapon: accusationWeapon,
                                     })
-                                );
+                                  );
+                                } else {
+                                    validateAccusation()
+                                }
                             }}
                             disabled={isControlsLocked}
                         >
