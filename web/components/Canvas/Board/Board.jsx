@@ -6,13 +6,18 @@ import {
   FormControl,
   InputLabel,
   MenuItem,
+  Paper,
+  CardMedia,
   Select,
+  Grid,
   Chip,
 } from "@mui/material";
 import formatLabel from "@/components/helpers/utils";
 import { GameContext } from "@/components/helpers/GameContext";
 import styles from "./Board.module.scss";
+import { styled } from '@mui/material/styles';
 
+import BoardGrid from "@/components/helpers/grid";
 
 function Board() {
   const { gameIdContext, clientIdContext, gameStateContext, websocket } =
@@ -136,31 +141,9 @@ function Board() {
       {/* display board */}
       {gameState.game_phase === 1 && (
         <div>
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: { xs: 'column', md: 'row' },
-              alignItems: 'center',
-              bgcolor: 'background.paper',
-              overflow: 'hidden',
-              borderRadius: '12px',
-              boxShadow: 1,
-              fontWeight: 'bold',
-            }}
-          >
-            <Box
-              component="img"
-              sx={{
-                height: '100%',
-                width: '100%',
-                objectFit: 'cover'
-              }}
-              src={"/static/board.png"}
-              alt="board"
-            >
-            </Box>
-          </Box>
+          < BoardGrid />
         </div>
+
       )
       }
 
