@@ -1,4 +1,3 @@
-
 import React, { useContext, useEffect, useState } from "react";
 import {
   Button,
@@ -15,9 +14,10 @@ import {
 import formatLabel from "@/components/helpers/utils";
 import { GameContext } from "@/components/helpers/GameContext";
 import styles from "./Board.module.scss";
-import { styled } from '@mui/material/styles';
+import { styled } from "@mui/material/styles";
 
 import BoardGrid from "@/components/helpers/grid";
+import Cards from "./Cards";
 
 function Board() {
   const { gameIdContext, clientIdContext, gameStateContext, websocket } =
@@ -43,7 +43,6 @@ function Board() {
   // this is a action history for the incremental demo
   const [history, setHistory] = useState([]);
 
-
   useEffect(() => {
     if (websocket.current) {
       websocket.current.addEventListener("message", (message) => {
@@ -60,8 +59,7 @@ function Board() {
           setGameState((prevGameState) => {
             return { ...prevGameState, ...new_state };
           });
-        }
-        else if (new_state.type === "turn_error") {
+        } else if (new_state.type === "turn_error") {
           alert("Error: It is not your turn!");
         }
       });
@@ -76,9 +74,7 @@ function Board() {
       console.log(gameState?.previous_move);
       setHistory((history) => [...history, gameState?.previous_move]);
     }
-
   }, [gameState]);
-
 
   return (
     <div className={styles.Board}>
@@ -143,23 +139,18 @@ function Board() {
         <div>
           < BoardGrid suspectLocs={gameState?.suspect_locations} />
         </div>
+      )}
 
-      )
-      }
+      {gameState.game_phase === 1 && (
+        <b>It is {formatLabel(gameState.current_turn)}&apos;s turn</b>
+      )}
 
-      {
-        gameState.game_phase === 1 && (
-          <b>It is {formatLabel(gameState.current_turn)}&apos;s turn</b>
-        )
-      }
+      {gameState.game_phase === 2 && (
+        <div>Game Over! {formatLabel(gameState?.winner)} won!</div>
+      )}
 
-
-      {
-        gameState.game_phase === 2 && (
-          <div>Game Over! {formatLabel(gameState?.winner)} won!</div>
-        )
-      }
-    </div >
+      <Cards />
+    </div>
   );
 }
 
