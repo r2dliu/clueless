@@ -61,7 +61,6 @@ class Clueless:
             "ballroom_billiard",
             "library_billiard",
         ]
-        self.secret_passages = ["study_kitchen", "lounge_conservatory"]
 
         self.starting_locations = [
             "scarlet_start",
@@ -125,9 +124,14 @@ class Clueless:
         # if in room
         else:
             # could use a secret passage
-            for passage in self.secret_passages:
-                if current_loc in passage:
-                    allowed_moves.append(passage)
+            if current_loc == "study":
+                allowed_moves.append("kitchen")
+            elif current_loc == "kitchen":
+                allowed_moves.append("study")
+            elif current_loc == "lounge":
+                allowed_moves.append("conservatory")
+            elif current_loc == "conservatory":
+                allowed_moves.append("lounge")
 
             # could stay in room (if moved to current room by opponent)
             # TODO track if token was moved by a suggestion since player's last
@@ -315,7 +319,8 @@ class Clueless:
             self.state["winner"] = player
             self.state["game_phase"] = GamePhase.COMPLETED.value
         else:
-            self.state["previous_move"] = player + " made an incorrect accusation"
+            self.state[
+                "previous_move"] = player + " made an incorrect accusation"
             self.rotate_next_player(player)
             self.state["turn_order"].remove(player)
 
