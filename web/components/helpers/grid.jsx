@@ -11,6 +11,7 @@ import {
 // If not occupied: render image at location i with image i
 // If occupied by player: render image i and token(s) at location i
 export default function BoardGrid() {
+
     // Grid is 5 x 5
     return (
         <Grid container spacing={0} columns={10} width={'75%'}>
@@ -26,6 +27,7 @@ export default function BoardGrid() {
 
             <Grid item xs={2}>
                 <CardMedia
+                    component={"img"}
                     src={"/static/board/hall_h.jpg"}
                 />
             </Grid>
@@ -35,7 +37,6 @@ export default function BoardGrid() {
                     component={"img"}
                     src={"/static/board/room_hall.jpg"}
                 />
-
             </Grid>
 
             <Grid item xs={2}>
@@ -45,13 +46,14 @@ export default function BoardGrid() {
                 />
             </Grid>
 
-
             <Grid item xs={2}>
                 <CardMedia
                     component={"img"}
                     src={"/static/board/room_lounge.jpg"}
                 />
             </Grid>
+
+
 
 
             {/* hallways */}
@@ -212,8 +214,6 @@ export default function BoardGrid() {
             </Grid>
 
 
-
         </Grid >
     );
 }
-
