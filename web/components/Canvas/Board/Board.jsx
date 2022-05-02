@@ -12,9 +12,9 @@ import {
   Chip,
 } from "@mui/material";
 import formatLabel from "@/components/helpers/utils";
+import getToken from "@/components/helpers/token";
 import { GameContext } from "@/components/helpers/GameContext";
 import styles from "./Board.module.scss";
-import { styled } from "@mui/material/styles";
 
 import BoardGrid from "@/components/helpers/grid";
 import Cards from "./Cards";
@@ -136,21 +136,36 @@ function Board() {
 
       {/* display board */}
       {gameState.game_phase === 1 && (
+
         <div>
-          < BoardGrid suspectLocs={gameState?.suspect_locations} />
+          < BoardGrid suspectLocs={gameState?.suspect_locations}
+          />
         </div>
-      )}
+      )
+      }
 
+      {/* display current turn text and token */}
+      {
+        gameState.game_phase === 1 && (
+          <b>It is {formatLabel(gameState.current_turn)}&apos;s turn</b>
+
+        )
+      }
       {gameState.game_phase === 1 && (
-        <b>It is {formatLabel(gameState.current_turn)}&apos;s turn</b>
-      )}
+        <div className={styles[getToken(gameState.current_turn)]}>
+        </div>
 
-      {gameState.game_phase === 2 && (
-        <div>Game Over! {formatLabel(gameState?.winner)} won!</div>
-      )}
+      )
+      }
+
+      {
+        gameState.game_phase === 2 && (
+          <div>Game Over! {formatLabel(gameState?.winner)} won!</div>
+        )
+      }
 
       <Cards />
-    </div>
+    </div >
   );
 }
 

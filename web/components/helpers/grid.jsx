@@ -5,21 +5,21 @@ import {
     CardMedia,
     Typography, //remove later
 } from "@mui/material";
-
+import getToken from "@/components/helpers/token";
 
 /* This function takes in current suspect locations (dict) and places character tokens on the board
     If not occupied: render image at location i with image i
     If occupied by player: render image i and token(s) at location i
 
- TODO: Grid items should be generated with with a map, not explicitly like below
-    Need: enum for files (or label files 0-24), enum for token colors ? 
+ TODO: Grid items should be generated with a map, not explicitly like below
+    Need: enum for files (or label files 0-24)
 */
 export default function BoardGrid(suspectLocs) {
 
     // Grid is 5 x 5
     // TODO: loop over grid from top left to bottom right, display room/hall image + any token in room
     return (
-        <Grid container spacing={0} columns={10} width={'75%'}>
+        <Grid container spacing={0} columns={10} width={'60%'}>
 
             {/* top row */}
             < Grid container item xs={2} >
