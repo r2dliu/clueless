@@ -68,7 +68,7 @@ function Controls() {
     const [accusationWeapon, setAccusationWeapon] = useState("");
     const [accusationRoom, setAccusationRoom] = useState("");
 
-    const [suggestionErrors, setSuggetsionErrors] = useState({
+    const [suggestionErrors, setSuggestionErrors] = useState({
         "room": false,
         "weapon": false,
         "suspect": false
@@ -106,7 +106,7 @@ function Controls() {
         if(!suggestionSuspect) isSuspectValid = false;
         if(!suggestionRoom) isRoomValid = false;
         if(!suggestionWeapon) isWeaponValid = false;
-        setSuggetsionErrors({
+        setSuggestionErrors({
             "weapon" : !isWeaponValid,
             "room" : !isRoomValid,
             "suspect" : !isSuspectValid
