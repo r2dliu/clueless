@@ -2,13 +2,6 @@ import React, { useContext, useEffect, useState } from "react";
 import {
   Button,
   Box,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Paper,
-  CardMedia,
-  Select,
-  Grid,
   Chip,
 } from "@mui/material";
 import formatLabel from "@/components/helpers/utils";
@@ -37,11 +30,7 @@ function Board() {
   ];
 
   const clientSuspect = (gameState?.assignments || {})[`${clientId}`];
-  const [action, setAction] = useState("");
   const [accusation, currentAccusation] = useState({});
-
-  // this is a action history for the incremental demo
-  const [history, setHistory] = useState([]);
 
   useEffect(() => {
     if (websocket.current) {
@@ -66,16 +55,6 @@ function Board() {
     }
   }, [websocket]);
 
-  useEffect(() => {
-    if (
-      typeof gameState?.previous_move === "string" ||
-      gameState?.previous_move instanceof String
-    ) {
-      console.log(gameState?.previous_move);
-      setHistory((history) => [...history, gameState?.previous_move]);
-    }
-  }, [gameState]);
-
   return (
     <div className={styles.Board}>
       {/* message dump */}
@@ -86,10 +65,6 @@ function Board() {
           gameState
         )}`}</div>
       */}
-
-      {history.map((action) => (
-        <Chip label={action} variant="outlined" key={action} />
-      ))}
 
       {/* character selection */}
       {gameState.game_phase === 0 && (

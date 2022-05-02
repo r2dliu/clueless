@@ -19,7 +19,7 @@ export default function BoardGrid(suspectLocs) {
     // Grid is 5 x 5
     // TODO: loop over grid from top left to bottom right, display room/hall image + any token in room
     return (
-        <Grid container spacing={0} columns={10} width={'60%'}>
+        <Grid container spacing={0} columns={10} width={'75%'}>
 
             {/* top row */}
             < Grid container item xs={2} >
@@ -34,7 +34,7 @@ export default function BoardGrid(suspectLocs) {
                     />
 
                     {/* Example of displaying more than one token per room
-                        TODO: replace with token images, not text */}
+                        TODO: replace with tokens, not text */}
                     <Box
                         sx={{
                             position: 'absolute',
