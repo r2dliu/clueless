@@ -137,7 +137,7 @@ function Board() {
       {/* display board */}
       {gameState.game_phase === 1 && (
         <div>
-          <BoardGrid />
+          < BoardGrid suspectLocs={gameState?.suspect_locations} />
         </div>
       )}
 

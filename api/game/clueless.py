@@ -213,16 +213,15 @@ class Clueless:
 
         return dict(zip(keys, values))
 
-    """
-    Shuffles and evenly distributes cards amongst players
-
-    Returns:
-        A dict containing {player: [cards]} pairs for each individual
-            player and a list of extra cards to be displayed to all players
-    """
 
     def distribute_cards(self) -> Tuple:
+        """
+        Shuffles and evenly distributes cards amongst players
 
+        Returns:
+            A dict containing {player: [cards]} pairs for each individual
+                player and a list of extra cards to be displayed to all players
+        """
         # ensure case file has been filled
         assert self.state["concealed_scenario"]
 
