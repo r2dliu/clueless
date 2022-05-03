@@ -1,18 +1,17 @@
 import React from 'react'
 import {
     Grid,
-    Box,
     CardMedia,
-    Typography, //remove later
+
 } from "@mui/material";
 import getToken from "@/components/helpers/token";
-
+import styles from "@/components/Canvas/Board/Board.module.scss";
 /* This function takes in current suspect locations (dict) and places character tokens on the board
     If not occupied: render image at location i with image i
-    If occupied by player: render image i and token(s) at location i
+    If occupied by player(s): render image i and token(s) at location i
 
  TODO: Grid items should be generated with a map, not explicitly like below
-    Need: enum for files (or label files 0-24)
+    Need: enum for files (or label files 0-24)?
 */
 export default function BoardGrid(suspectLocs) {
 
@@ -22,46 +21,34 @@ export default function BoardGrid(suspectLocs) {
         <Grid container spacing={0} columns={10} width={'75%'}>
 
             {/* top row */}
-            < Grid container item xs={2} >
+            < Grid item xs={2}
+                sx={{
+                    position: 'relative'
+                }} >
 
-                <Grid
-                    sx={{
-                        position: 'relative'
-                    }}> {/* this is a grid within the top left room */}
-                    <CardMedia
-                        component={"img"}
-                        src={"/static/board/room_study.jpg"}
-                    />
+                <CardMedia
+                    component={"img"}
+                    src={"/static/board/room_study.jpg"}
+                />
 
-                    {/* Example of displaying more than one token per room
-                        TODO: replace with tokens, not text */}
-                    <Box
-                        sx={{
-                            position: 'absolute',
-                            bottom: 0,
-                            left: 0,
-                            width: '100%',
-                            bgcolor: 'rgba(0, 0, 0, 0.5)',
-                            color: 'white',
-                        }}
-                    >
-                        <Typography variant="h5">Mr Green</Typography>
-                    </Box>
+                {/* Hardcoded example of displaying more than one token per room*/}
+                <div style={{
+                    position: 'absolute',
+                    bottom: 50,
+                    right: 70,
+                }}
+                    className={styles[getToken('mrs_peacock')]}
+                ></div>
 
-                    <Box
-                        sx={{
-                            position: 'absolute',
-                            bottom: 10,
-                            left: 0,
-                            width: '100%',
-                            bgcolor: 'rgba(0, 0, 0, 0.5)',
-                            color: 'white',
-                        }}
-                    >
-                        <Typography variant="h5">Mrs White</Typography>
-                    </Box>
 
-                </Grid>
+                <div style={{
+                    position: 'absolute',
+                    bottom: 50,
+                    right: 50,
+                }}
+                    className={styles[getToken('mr_green')]}
+                ></div>
+                {/* End example*/}
 
             </Grid >
 
