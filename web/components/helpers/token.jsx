@@ -7,6 +7,7 @@ function getToken(character) {
     else if (character === 'mr_green') { token = 'mrGreen'; }
     else if (character === 'mrs_white') { token = 'mrsWhite'; }
     else if (character === 'mrs_peacock') { token = 'mrsPeacock'; }
+    else if (character === '') { token = 'debug'; }
     return (token);
 }
 export default getToken;

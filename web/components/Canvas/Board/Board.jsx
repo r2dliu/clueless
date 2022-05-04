@@ -71,7 +71,7 @@ function Board() {
       setHistory((history) => [...history, gameState?.previous_move]);
     }
 
-    if(gameState?.game_phase === 0) {
+    if (gameState?.game_phase === 0) {
       let newAssignments = {};
       for (const player in gameState?.assignments) {
         newAssignments[`${gameState?.assignments[player]}`] = player;
@@ -141,8 +141,7 @@ function Board() {
       {gameState.game_phase === 1 && (
 
         <div>
-          < BoardGrid suspectLocs={gameState?.suspect_locations}
-          />
+          < BoardGrid />
         </div>
       )
       }

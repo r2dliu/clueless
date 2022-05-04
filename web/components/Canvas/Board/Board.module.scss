@@ -18,7 +18,8 @@
 .professorPlum,
 .mrGreen,
 .mrsWhite,
-.mrsPeacock {
+.mrsPeacock,
+.debug {
   height: 20px;
   width: 20px;
   border-radius: 20px;
@@ -46,4 +47,8 @@
 
 .mrsPeacock {
   background-color: navy;
+}
+
+.debug {
+  background-color: 'rgb(0,0,0,0)';
 }
