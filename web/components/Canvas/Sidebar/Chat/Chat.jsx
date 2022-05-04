@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import { GameContext } from "@/components/helpers/GameContext";
 import { TextField } from "@mui/material";
+import styles from "./Chat.module.scss";
 
 function Chat() {
   const [messages, setMessages] = useState([]);
@@ -32,15 +33,20 @@ function Chat() {
   }, [websocket]);
 
   return (
-    <div>
-      <b>chat</b>
-      {messages.map((message, i) => (
-        <p key={i}>{message}</p>
-      ))}
+    <div className={styles.Chat}>
+      <div className={styles.messagesWrapper}>
+        <div className={styles.messages}>
+          {messages.map((message, i) => (
+            <p key={i}>{message}</p>
+          ))}
+        </div>
+      </div>
       <TextField
         inputRef={chatInputRef}
         id="chat"
         variant="outlined"
+        label="Chat"
+        size="small"
         onKeyPress={(e) => {
           if (e.key === "Enter" && !!chatInputRef.current.value) {
             websocket?.current?.send(
