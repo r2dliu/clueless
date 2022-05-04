@@ -39,6 +39,9 @@ function Board() {
   const [accusation, currentAccusation] = useState({});
   const [rulesOpen, setRulesOpen] = useState(false);
 
+  // { suspect: player }
+  const [assignments, setAssignments] = useState({});
+
   // this is a action history for the incremental demo
   const [history, setHistory] = useState([]);
 
@@ -78,13 +81,22 @@ function Board() {
       setHistory((history) => [...history, gameState?.previous_move]);
     }
 
+    if(gameState?.game_phase === 0) {
+      let newAssignments = {};
+      for (const player in gameState?.assignments) {
+        newAssignments[`${gameState?.assignments[player]}`] = player;
+      }
+      setAssignments(newAssignments);
+      console.log(newAssignments);
+    }
+
   }, [gameState]);
+
 
   useEffect(() => {
     console.log('rules open -> ' + rulesOpen)
 
   }, [rulesOpen]);
-
 
   return (
     <div className={styles.Board}>
@@ -119,6 +131,7 @@ function Board() {
                   })
                 );
               }}
+              disabled={assignments[suspect]}
             >
               {suspect}
             </Button>

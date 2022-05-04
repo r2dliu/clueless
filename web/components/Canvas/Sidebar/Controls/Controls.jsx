@@ -57,11 +57,22 @@ function Controls() {
     const [action, setAction] = useState("");
     const [accusation, currentAccusation] = useState({});
 
+    const [accusationErrors, setAccusationErrors] = useState({
+        "room": false,
+        "weapon": false,
+        "suspect": false
+    })
+
     // todo clean these all up into a accusation and suggestion objects. using a single object was causing async issues
     const [accusationSuspect, setAccusationSuspect] = useState("");
     const [accusationWeapon, setAccusationWeapon] = useState("");
     const [accusationRoom, setAccusationRoom] = useState("");
 
+    const [suggestionErrors, setSuggestionErrors] = useState({
+        "room": false,
+        "weapon": false,
+        "suspect": false
+    })
     const [suggestionSuspect, setSuggestionSuspect] = useState("");
     const [suggestionWeapon, setSuggestionWeapon] = useState("");
     const [suggestionRoom, setSuggestionRoom] = useState("");
@@ -76,6 +87,31 @@ function Controls() {
             );
     }, [gameState]);
 
+    function validateAccusationFields() {
+        // only calling the hook once to avoid race condition
+        let isSuspectValid = true, isRoomValid = true, isWeaponValid = true;
+        if(!accusationSuspect) isSuspectValid = false;
+        if(!accusationRoom) isRoomValid = false;
+        if(!accusationWeapon) isWeaponValid = false;
+        setAccusationErrors({
+            "weapon" : !isWeaponValid,
+            "room" : !isRoomValid,
+            "suspect" : !isSuspectValid
+        })
+    }
+
+    function validateSuggestionFields() {
+        // only calling the hook once to avoid race condition
+        let isSuspectValid = true, isRoomValid = true, isWeaponValid = true;
+        if(!suggestionSuspect) isSuspectValid = false;
+        if(!suggestionRoom) isRoomValid = false;
+        if(!suggestionWeapon) isWeaponValid = false;
+        setSuggestionErrors({
+            "weapon" : !isWeaponValid,
+            "room" : !isRoomValid,
+            "suspect" : !isSuspectValid
+        })
+    }
 
     return (
         <div>
@@ -154,6 +190,7 @@ function Controls() {
                                         location: move,
                                     })
                                 );
+                                setAction("");
                             }}
                             disabled={isControlsLocked}
                         >
@@ -165,16 +202,16 @@ function Controls() {
 
             {gameState.game_phase === 1 && action == "end_turn" && (
                 <Button
-                key="end_turn"
-                variant="outlined"
-                onClick={() => {
-                    websocket?.current?.send(
-                    JSON.stringify({
-                        type: "end_turn",
-                    })
-                    );
-                }}
-                disabled={isControlsLocked}
+                    key="end_turn"
+                    variant="outlined"
+                    onClick={() => {
+                        websocket?.current?.send(
+                            JSON.stringify({
+                                type: "end_turn",
+                            })
+                        );
+                    }}
+                    disabled={isControlsLocked}
                 >
                     Submit
                 </Button>
@@ -196,6 +233,7 @@ function Controls() {
                                 onChange={(event) => {
                                     setSuggestionSuspect(event.target.value);
                                 }}
+                                error={suggestionErrors.suspect}
                                 disabled={isControlsLocked}
                             >
                                 {suspects.map((suspect) => (
@@ -218,6 +256,7 @@ function Controls() {
                                 onChange={(event) => {
                                     setSuggestionWeapon(event.target.value);
                                 }}
+                                error={suggestionErrors.weapon}
                                 disabled={isControlsLocked}
                             >
                                 {weapons.map((weapon) => (
@@ -240,6 +279,7 @@ function Controls() {
                                 onChange={(event) => {
                                     setSuggestionRoom(event.target.value);
                                 }}
+                                error={suggestionErrors.room}
                                 disabled={isControlsLocked}
                             >
                                 <MenuItem key={currentRoom} value={currentRoom}>
@@ -253,14 +293,19 @@ function Controls() {
                             key={`submit-suggestion`}
                             variant="contained"
                             onClick={() => {
-                                websocket?.current?.send(
-                                    JSON.stringify({
-                                        type: "suggestion",
-                                        suspect: suggestionSuspect,
-                                        room: suggestionRoom,
-                                        weapon: suggestionWeapon,
-                                    })
-                                );
+                                if(suggestionRoom && suggestionSuspect && suggestionWeapon) {
+                                    websocket?.current?.send(
+                                        JSON.stringify({
+                                            type: "suggestion",
+                                            suspect: suggestionSuspect,
+                                            room: suggestionRoom,
+                                            weapon: suggestionWeapon,
+                                        })
+                                    );
+                                }
+                                else {
+                                    validateSuggestionFields();
+                                }
                             }}
                             disabled={isControlsLocked}
                         >
@@ -273,10 +318,15 @@ function Controls() {
                                 setSuggestionRoom("");
                                 setSuggestionSuspect("");
                                 setSuggestionWeapon("");
+                                setSuggestionErrors({
+                                    "room": false,
+                                    "weapon": false,
+                                    "suspect": false
+                                });
                             }}
                             disabled={isControlsLocked}
                         >
-                            Cancel Suggestion
+                            Clear Suggestion
                         </Button>
                     </div>
                     <div className={styles.submission}></div>
@@ -301,6 +351,7 @@ function Controls() {
                                     setAccusationSuspect(event.target.value);
                                 }}
                                 disabled={isControlsLocked}
+                                error={accusationErrors.suspect}
                             >
                                 {suspects.map((suspect) => (
                                     <MenuItem key={suspect} value={suspect}>
@@ -323,6 +374,7 @@ function Controls() {
                                     setAccusationWeapon(event.target.value);
                                 }}
                                 disabled={isControlsLocked}
+                                error={accusationErrors.weapon}
                             >
                                 {weapons.map((weapon) => (
                                     <MenuItem key={weapon} value={weapon}>
@@ -345,6 +397,7 @@ function Controls() {
                                     setAccusationRoom(event.target.value);
                                 }}
                                 disabled={isControlsLocked}
+                                error={accusationErrors.room}
                             >
                                 {rooms.map((room) => (
                                     <MenuItem key={room} value={room}>
@@ -359,14 +412,18 @@ function Controls() {
                             key={`submit-accusation`}
                             variant="contained"
                             onClick={() => {
-                                websocket?.current?.send(
+                                if (accusationSuspect && accusationRoom && accusationWeapon) {
+                                  websocket?.current?.send(
                                     JSON.stringify({
-                                        type: "accusation",
-                                        suspect: accusationSuspect,
-                                        room: accusationRoom,
-                                        weapon: accusationWeapon,
+                                      type: "accusation",
+                                      suspect: accusationSuspect,
+                                      room: accusationRoom,
+                                      weapon: accusationWeapon,
                                     })
-                                );
+                                  );
+                                } else {
+                                    validateAccusationFields()
+                                }
                             }}
                             disabled={isControlsLocked}
                         >
@@ -379,10 +436,15 @@ function Controls() {
                                 setAccusationRoom("");
                                 setAccusationSuspect("");
                                 setAccusationWeapon("");
+                                setAccusationErrors({
+                                    "room": false,
+                                    "weapon": false,
+                                    "suspect": false
+                                });
                             }}
                             disabled={isControlsLocked}
                         >
-                            Cancel Accusation
+                            Clear Accusation
                         </Button>
                     </div>
                 </div>
