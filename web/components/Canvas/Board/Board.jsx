@@ -171,7 +171,13 @@ function Board() {
           <div>Game Over! {formatLabel(gameState?.winner)} won!</div>
         )
       }
-
+      
+      {
+        gameState.game_phase === 3 && (
+          <div>Game Over! Nobody wins!</div>
+      )
+      }
+      
       <Cards />
     </div >
   );
