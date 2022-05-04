@@ -140,7 +140,12 @@ function Board() {
       {/* display board */}
       {gameState.game_phase === 1 && (
 
-        <div>
+        <div style={{
+          position: 'relative',
+          bottom: 0,
+          justifyContent: 'center',
+          left: 120, // TODO: center the board properly
+        }} >
           < BoardGrid />
         </div>
       )
@@ -153,11 +158,12 @@ function Board() {
 
         )
       }
-      {gameState.game_phase === 1 && (
-        <div className={styles[getToken(gameState.current_turn)]}>
-        </div>
+      {
+        gameState.game_phase === 1 && (
+          <div className={styles[getToken(gameState.current_turn)]}>
+          </div>
 
-      )
+        )
       }
 
       {

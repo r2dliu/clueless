@@ -51,7 +51,11 @@ export default function BoardGrid() {
 
     // Grid is 5 x 5
     return (
-        <Grid container spacing={0} columns={10} width={'75%'}>
+        <Grid
+            container
+            spacing={0}
+            columns={10}
+            width={'75%'}>
 
             {/* top row */}
             < Grid item xs={2}
