@@ -116,7 +116,7 @@ async def websocket_connection(websocket: WebSocket, game_uuid: str,
 
                     # End turn
                     elif (data["type"] == "end_turn"):
-                        game.rotate_next_player(clientSuspect)
+                        game.rotate_next_player(clientSuspect, False)
 
                     # handle other types of messages
                     # pick character

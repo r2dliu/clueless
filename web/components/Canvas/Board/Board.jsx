@@ -72,7 +72,7 @@ function Board() {
       setHistory((history) => [...history, gameState?.previous_move]);
     }
 
-    if(gameState?.game_phase === 0) {
+    if (gameState?.game_phase === 0) {
       let newAssignments = {};
       for (const player in gameState?.assignments) {
         newAssignments[`${gameState?.assignments[player]}`] = player;
@@ -149,6 +149,10 @@ function Board() {
 
       {gameState.game_phase === 2 && (
         <div>Game Over! {formatLabel(gameState?.winner)} won!</div>
+      )}
+
+      {gameState.game_phase == 3 && (
+        <div>Game Over! Nobody wins!</div>
       )}
     </div>
   );
