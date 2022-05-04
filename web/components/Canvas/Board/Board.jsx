@@ -10,6 +10,7 @@ import {
 import formatLabel from "@/components/helpers/utils";
 import { GameContext } from "@/components/helpers/GameContext";
 import styles from "./Board.module.scss";
+import Suggestion from "../Suggestion/Suggestion";
 
 function Board() {
   const { gameIdContext, clientIdContext, gameStateContext, websocket } =
@@ -149,6 +150,12 @@ function Board() {
 
       {gameState.game_phase === 2 && (
         <div>Game Over! {formatLabel(gameState?.winner)} won!</div>
+      )}
+
+      {gameState.game_phase === 4 && (
+        <Suggestion 
+          currentTurn = {formatLabel(gameState.current_turn)}
+        />
       )}
     </div>
   );
