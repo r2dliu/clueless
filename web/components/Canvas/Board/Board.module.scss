@@ -11,5 +11,44 @@
     width: 100%;
     overflow-wrap: anywhere;
   }
+}
 
+.colonelMustard,
+.missScarlet,
+.professorPlum,
+.mrGreen,
+.mrsWhite,
+.mrsPeacock,
+.debug {
+  height: 20px;
+  width: 20px;
+  border-radius: 20px;
+}
+
+.mrsWhite {
+  background-color: lightslategrey;
+}
+
+.missScarlet {
+  background-color: red;
+}
+
+.colonelMustard {
+  background-color: yellow;
+}
+
+.mrGreen {
+  background-color: green;
+}
+
+.professorPlum {
+  background-color: purple;
+}
+
+.mrsPeacock {
+  background-color: navy;
+}
+
+.debug {
+  background-color: rgb(0, 0, 0, 0);
 }

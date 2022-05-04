@@ -1,6 +1,7 @@
 # from typing import Optional
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.staticfiles import StaticFiles
 from connection_manager import ConnectionManager
 from uuid import UUID, uuid4
 import json
@@ -8,6 +9,7 @@ from typing import Optional
 from game.clueless import Clueless
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
 connection_manager = ConnectionManager()
 games_by_id = {}
 
