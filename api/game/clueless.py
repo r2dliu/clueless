@@ -188,7 +188,7 @@ class Clueless:
             self.state["visible_cards"],
         ) = self.distribute_cards()
 
-        # front-end Cards.jsx uses player_cards only -- adding visible to all players cards
+        # front-end Cards.jsx uses cards_to_display only -- not separately displaying visible + player cards
         self.state["cards_to_display"] = {}
         for k, v in self.state["player_cards"].items():
             self.state["cards_to_display"][k] = self.state["player_cards"][k] + self.state["visible_cards"]
