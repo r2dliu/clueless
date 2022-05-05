@@ -1,5 +1,6 @@
 import random
 import json
+import copy
 from enum import Enum
 from typing import Dict, List, Tuple
 from connection_manager import ConnectionManager
@@ -90,6 +91,8 @@ class Clueless:
             "player_cards": {},  # dict of player: player's card list
             "visible_cards": [],  # list of cards shown to all players
             "turn_order": [],  # player turn order
+            "suggestion_order": [], # suggestion order
+            "next_to_disprove": '', # next suspect to disprove suggestion
             "current_turn": "miss_scarlet",  # player token
             "suggestion": {},  # holds current suggestion players must disprove
             "winner": {},  # holds the winner of the game
@@ -184,8 +187,16 @@ class Clueless:
             self.state["visible_cards"],
         ) = self.distribute_cards()
 
+        # front-end Cards.jsx uses player_cards only -- adding visible to all players cards
+        for k, v in self.state["player_cards"].items():
+            self.state["player_cards"][k] += self.state["visible_cards"]
+
         # set turn order for the game
         self.state["turn_order"] = self.generate_turn_order()
+
+        # set suggestion order for the game -- copy at start ensures 
+        # we include players who make incorrect accusations
+        self.state["suggestion_order"] = copy.deepcopy(self.state["turn_order"])
 
         # get first player to move
         for token in self.players:
@@ -282,8 +293,7 @@ class Clueless:
     def get_next_player(self, player: str) -> Tuple:
         """Returns the next token to move.
         Note: does not update the game state, expected to be handled by caller.
-        This function is also used to determine next player up to disprove a
-        suggestion.
+    
 
         Args:
             player: current player's token (i.e. 'professor_plum')
@@ -337,3 +347,18 @@ class Clueless:
             #self.rotate_next_player(player)
         # else:
         # todo return error?
+
+
+    def next_to_disprove(self, player: str) -> str:
+        """ Updates game state with next character up to disprove suggestion """
+        idx = self.state["suggestion_order"].index(player)
+
+        # get next player token
+        try:
+            next_player = self.state["suggestion_order"][idx + 1]
+        except IndexError:
+            next_player = self.state["suggestion_order"][0]
+
+        self.state['next_to_disprove'] = next_player
+
+        return self.state['next_to_disprove']

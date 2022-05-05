@@ -115,6 +115,13 @@ async def websocket_connection(websocket: WebSocket, game_uuid: str,
                         else:
                             await connection_manager.send_personal_message(
                                 json.dumps({"type": "turn_error"}), websocket)
+                    
+                    # Suggestion cycle
+                    # suggestion_actor = character that initiated suggestion
+                    # front end caller should: update suggestion_actor as cycle continues and
+                    # break if game.state['next_to_disprove'] == clientSuspect (initiator)
+                    elif (data["type"] == "next_to_disprove"):
+                        game.next_to_disprove(data["suggestion_actor"])
 
                     # End turn
                     elif (data["type"] == "end_turn"):
