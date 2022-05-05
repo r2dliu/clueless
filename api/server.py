@@ -110,11 +110,25 @@ async def websocket_connection(websocket: WebSocket, game_uuid: str,
                     elif (data["type"] == "suggestion"):
                         # Validate turn order
                         if (message["current_turn"] == clientSuspect):
-                            # Handle suggestion
-                            pass
+                            # Handle suggestion 
+                            game.initiate_suggestion(clientSuspect)
                         else:
                             await connection_manager.send_personal_message(
                                 json.dumps({"type": "turn_error"}), websocket)
+                    
+                    # Suggestion cycle
+                    # front end caller should update suggestion_actor as cycle continues
+                    # break when full circle msg is sent
+                    elif (data["type"] == "next_to_disprove"):
+                        next_up = game.next_to_disprove(data["suggestion_actor"])
+                        # has every player attempted to disprove?
+                        if next_up == message["suggestion_starter"]:
+                            await connection_manager.send_personal_message(
+                                json.dumps({"type": "full_circle"}), websocket)
+
+                    # End suggestion
+                    elif (data["type"] == "end_suggestion"):
+                        game.terminate_suggestion()
 
                     # End turn
                     elif (data["type"] == "end_turn"):

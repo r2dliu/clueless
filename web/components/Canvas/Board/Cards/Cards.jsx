@@ -21,7 +21,7 @@ function Cards() {
   const [gameState, setGameState] = gameStateContext;
 
   const character = (gameState?.assignments || {})[clientId];
-  const cards = (gameState?.player_cards || {})[character] || [];
+  const cards = (gameState?.cards_to_display || {})[character] || [];
 
   return (
     gameState.game_phase === 1 && (
