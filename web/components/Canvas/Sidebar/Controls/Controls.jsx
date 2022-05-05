@@ -13,13 +13,15 @@ import { GameContext } from "@/components/helpers/GameContext";
 import styles from "../Sidebar.module.scss";
 
 
-function Controls() {
+function Controls(props) {
     const { gameIdContext, clientIdContext, gameStateContext, websocket } =
         useContext(GameContext);
 
     const [gameId, _setGameId] = gameIdContext;
     const [clientId, _setClientId] = clientIdContext;
     const [gameState, setGameState] = gameStateContext;
+
+    const openRulesDialog = () => props.setRulesOpen(true);
 
     const suspects = [
         "colonel_mustard",
@@ -169,6 +171,17 @@ function Controls() {
                                 size="large"
                             >
                                 End Turn
+                            </Button>
+                            <Button
+                                id="see_rules"
+                                variant="contained"
+                                onClick={() => {
+                                    openRulesDialog();
+                                }}
+                                disabled={isControlsLocked}
+                                size="large"
+                            >
+                                See Rules
                             </Button>
                         </ButtonGroup>
                     </div>

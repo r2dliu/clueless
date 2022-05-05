@@ -13,7 +13,7 @@ import Rules from "../Rules/Rules";
 import BoardGrid from "@/components/helpers/grid";
 import Cards from "./Cards";
 
-function Board() {
+function Board(props) {
   const { gameIdContext, clientIdContext, gameStateContext, websocket } =
     useContext(GameContext);
 
@@ -32,7 +32,6 @@ function Board() {
 
   const clientSuspect = (gameState?.assignments || {})[`${clientId}`];
   const [accusation, currentAccusation] = useState({});
-  const [rulesOpen, setRulesOpen] = useState(false);
 
   // { suspect: player }
   const [assignments, setAssignments] = useState({});
@@ -40,8 +39,8 @@ function Board() {
   // this is a action history for the incremental demo
   const [history, setHistory] = useState([]);
 
-  const openRulesDialog = () => setRulesOpen(true);
-  const closeRulesDialog = () => setRulesOpen(false);
+  const openRulesDialog = () => props.setRulesOpen(true);
+  const closeRulesDialog = () => props.setRulesOpen(false);
 
   useEffect(() => {
     if (websocket.current) {
@@ -143,13 +142,13 @@ function Board() {
       )}
 
 
-      {gameState.game_phase === 1 && rulesOpen && (
-        <Rules rulesOpen={rulesOpen}
+      {gameState.game_phase === 1 && props.rulesOpen && (
+        <Rules rulesOpen={props.rulesOpen}
                 closeRulesDialog={closeRulesDialog}
                 openRulesDialog={openRulesDialog}/>
       )}
 
-      {gameState.game_phase === 1 && !rulesOpen && (
+      {gameState.game_phase === 1 && !props.rulesOpen && (
           <b>It is {formatLabel(gameState.current_turn)}&apos;s turn</b>
       )}
       {/* display board */}

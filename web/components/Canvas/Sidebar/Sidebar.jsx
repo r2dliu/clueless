@@ -5,14 +5,14 @@ import Controls from "./Controls";
 import Cards from "../Board/Cards";
 import styles from "./Sidebar.module.scss";
 
-function Sidebar() {
+function Sidebar(props) {
   return (
     <div className={styles.Sidebar}>
       <div>
         <Chat />
         <br></br>
         <br></br>
-        <Controls />
+        <Controls setRulesOpen={props.setRulesOpen} />
       </div>
     </div>
   );
