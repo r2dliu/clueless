@@ -1,12 +1,17 @@
 import React, { useContext, useEffect, useState } from "react";
 import {
   Button,
+  Box,
   Chip,
 } from "@mui/material";
 import formatLabel from "@/components/helpers/utils";
+import getToken from "@/components/helpers/token";
 import { GameContext } from "@/components/helpers/GameContext";
 import styles from "./Board.module.scss";
 import Rules from "../Rules/Rules";
+
+import BoardGrid from "@/components/helpers/grid";
+import Cards from "./Cards";
 
 function Board() {
   const { gameIdContext, clientIdContext, gameStateContext, websocket } =
@@ -26,7 +31,6 @@ function Board() {
   ];
 
   const clientSuspect = (gameState?.assignments || {})[`${clientId}`];
-  const [action, setAction] = useState("");
   const [accusation, currentAccusation] = useState({});
   const [rulesOpen, setRulesOpen] = useState(false);
 
@@ -55,8 +59,7 @@ function Board() {
           setGameState((prevGameState) => {
             return { ...prevGameState, ...new_state };
           });
-        }
-        else if (new_state.type === "turn_error") {
+        } else if (new_state.type === "turn_error") {
           alert("Error: It is not your turn!");
         }
       });
@@ -72,7 +75,7 @@ function Board() {
       setHistory((history) => [...history, gameState?.previous_move]);
     }
 
-    if(gameState?.game_phase === 0) {
+    if (gameState?.game_phase === 0) {
       let newAssignments = {};
       for (const player in gameState?.assignments) {
         newAssignments[`${gameState?.assignments[player]}`] = player;
@@ -93,10 +96,6 @@ function Board() {
           gameState
         )}`}</div>
       */}
-
-      {history.map((action) => (
-        <Chip label={action} variant="outlined" key={action} />
-      ))}
 
       {/* character selection */}
       {gameState.game_phase === 0 && (
@@ -153,12 +152,49 @@ function Board() {
       {gameState.game_phase === 1 && !rulesOpen && (
           <b>It is {formatLabel(gameState.current_turn)}&apos;s turn</b>
       )}
+      {/* display board */}
+      {gameState.game_phase === 1 && (
 
+        <div style={{
+          position: 'relative',
+          bottom: 0,
+          justifyContent: 'center',
+          left: 120, // TODO: center the board properly
+        }} >
+          < BoardGrid />
+        </div>
+      )
+      }
 
-      {gameState.game_phase === 2 && (
-        <div>Game Over! {formatLabel(gameState?.winner)} won!</div>
-      )}
-    </div>
+      {/* display current turn text and token */}
+      {
+        gameState.game_phase === 1 && (
+          <b>It is {formatLabel(gameState.current_turn)}&apos;s turn</b>
+
+        )
+      }
+      {
+        gameState.game_phase === 1 && (
+          <div className={styles[getToken(gameState.current_turn)]}>
+          </div>
+
+        )
+      }
+
+      {
+        gameState.game_phase === 2 && (
+          <div>Game Over! {formatLabel(gameState?.winner)} won!</div>
+        )
+      }
+      
+      {
+        gameState.game_phase === 3 && (
+          <div>Game Over! Nobody wins!</div>
+      )
+      }
+      
+      <Cards />
+    </div >
   );
 }
 

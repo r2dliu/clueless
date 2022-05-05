@@ -1,5 +1,6 @@
 import random
 import json
+import copy
 from enum import Enum
 from typing import Dict, List, Tuple
 from connection_manager import ConnectionManager
@@ -9,6 +10,7 @@ class GamePhase(Enum):
     NOT_STARTED = 0
     IN_PROGRESS = 1
     COMPLETED = 2
+    ENDED = 3  # Everyone failed their accusations
 
 
 class Clueless:
@@ -89,6 +91,9 @@ class Clueless:
             "player_cards": {},  # dict of player: player's card list
             "visible_cards": [],  # list of cards shown to all players
             "turn_order": [],  # player turn order
+            "suggestion_starter": '',
+            "suggestion_order": [], # suggestion order
+            "next_to_disprove": '', # next suspect to disprove suggestion
             "current_turn": "miss_scarlet",  # player token
             "suggestion": {},  # holds current suggestion players must disprove
             "winner": {},  # holds the winner of the game
@@ -183,8 +188,17 @@ class Clueless:
             self.state["visible_cards"],
         ) = self.distribute_cards()
 
+        # front-end Cards.jsx uses cards_to_display only -- not separately displaying visible + player cards
+        self.state["cards_to_display"] = {}
+        for k, v in self.state["player_cards"].items():
+            self.state["cards_to_display"][k] = self.state["player_cards"][k] + self.state["visible_cards"]
+
         # set turn order for the game
         self.state["turn_order"] = self.generate_turn_order()
+
+        # set suggestion order for the game -- copy at start ensures 
+        # we include players who make incorrect accusations
+        self.state["suggestion_order"] = copy.deepcopy(self.state["turn_order"])
 
         # get first player to move
         for token in self.players:
@@ -213,16 +227,15 @@ class Clueless:
 
         return dict(zip(keys, values))
 
-    """
-    Shuffles and evenly distributes cards amongst players
-
-    Returns:
-        A dict containing {player: [cards]} pairs for each individual
-            player and a list of extra cards to be displayed to all players
-    """
 
     def distribute_cards(self) -> Tuple:
+        """
+        Shuffles and evenly distributes cards amongst players
 
+        Returns:
+            A dict containing {player: [cards]} pairs for each individual
+                player and a list of extra cards to be displayed to all players
+        """
         # ensure case file has been filled
         assert self.state["concealed_scenario"]
 
@@ -282,8 +295,7 @@ class Clueless:
     def get_next_player(self, player: str) -> Tuple:
         """Returns the next token to move.
         Note: does not update the game state, expected to be handled by caller.
-        This function is also used to determine next player up to disprove a
-        suggestion.
+    
 
         Args:
             player: current player's token (i.e. 'professor_plum')
@@ -299,8 +311,12 @@ class Clueless:
 
         return next_player
 
-    def rotate_next_player(self, player: str) -> str:
+    def rotate_next_player(self, player: str, justAccused: bool) -> str:
         self.state["previous_move"] = player + " ended_turn"
+
+        if justAccused:
+            self.state["previous_move"] = player + " made an incorrect accusation! They are out of the game!"
+
         self.state["current_turn"] = self.get_next_player(player)
         return self.state["current_turn"]
 
@@ -319,10 +335,12 @@ class Clueless:
             self.state["winner"] = player
             self.state["game_phase"] = GamePhase.COMPLETED.value
         else:
-            self.state[
-                "previous_move"] = player + " made an incorrect accusation"
-            self.rotate_next_player(player)
+            self.rotate_next_player(player, True)
             self.state["turn_order"].remove(player)
+
+        # End the game if all players are removed from turn order
+        if not self.state["turn_order"]:
+            self.state["game_phase"] = GamePhase.ENDED.value
 
     def move(self, player: str, location: str) -> Dict:
         if location in self.allowed_moves(player):
@@ -331,3 +349,25 @@ class Clueless:
             #self.rotate_next_player(player)
         # else:
         # todo return error?
+
+    def initiate_suggestion(self, player: str):
+        self.state["suggestion_starter"] = player
+        return 
+
+    def terminate_suggestion(self):
+        self.state["suggestion_starter"] = ''
+        return 
+
+    def next_to_disprove(self, player: str) -> str:
+        """ Updates game state with next character up to disprove suggestion """
+        idx = self.state["suggestion_order"].index(player)
+
+        # get next player token
+        try:
+            next_player = self.state["suggestion_order"][idx + 1]
+        except IndexError:
+            next_player = self.state["suggestion_order"][0]
+
+        self.state['next_to_disprove'] = next_player
+
+        return self.state['next_to_disprove']
