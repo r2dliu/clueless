@@ -91,6 +91,7 @@ class Clueless:
             "player_cards": {},  # dict of player: player's card list
             "visible_cards": [],  # list of cards shown to all players
             "turn_order": [],  # player turn order
+            "suggestion_starter": '',
             "suggestion_order": [], # suggestion order
             "next_to_disprove": '', # next suspect to disprove suggestion
             "current_turn": "miss_scarlet",  # player token
@@ -348,6 +349,13 @@ class Clueless:
         # else:
         # todo return error?
 
+    def initiate_suggestion(self, player: str):
+        self.state["suggestion_starter"] = player
+        return 
+
+    def terminate_suggestion(self):
+        self.state["suggestion_starter"] = ''
+        return 
 
     def next_to_disprove(self, player: str) -> str:
         """ Updates game state with next character up to disprove suggestion """
