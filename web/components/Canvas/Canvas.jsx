@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import cn from "classnames";
 import Board from "./Board";
 import Sidebar from "./Sidebar";
@@ -26,6 +26,8 @@ function Canvas() {
   const { gameIdContext, _clientIdContext, _gameStateContext } =
     useContext(GameContext);
   const [gameId, _setGameId] = gameIdContext;
+  
+  const [rulesOpen, setRulesOpen] = useState(false);
 
   return (
     <ThemeProvider theme={theme}>
@@ -34,8 +36,8 @@ function Canvas() {
           {!gameId && <MainMenu />}
           {gameId && (
             <>
-              <Board />
-              <Sidebar />
+              <Board rulesOpen={rulesOpen} setRulesOpen={setRulesOpen}/>
+              <Sidebar setRulesOpen={setRulesOpen} />
             </>
           )}
         </div>

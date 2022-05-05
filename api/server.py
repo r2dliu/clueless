@@ -111,7 +111,7 @@ async def websocket_connection(websocket: WebSocket, game_uuid: str,
                         # Validate turn order
                         if (message["current_turn"] == clientSuspect):
                             # Handle suggestion 
-                            game.initiate_suggestion(clientSuspect)
+                            game.initiate_suggestion(clientSuspect, data["suggestion"])
                         else:
                             await connection_manager.send_personal_message(
                                 json.dumps({"type": "turn_error"}), websocket)
