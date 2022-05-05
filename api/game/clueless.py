@@ -11,6 +11,7 @@ class GamePhase(Enum):
     IN_PROGRESS = 1
     COMPLETED = 2
     ENDED = 3  # Everyone failed their accusations
+    SUGGESTION = 4  # suggestion initated
 
 
 class Clueless:
@@ -350,8 +351,11 @@ class Clueless:
         # else:
         # todo return error?
 
-    def initiate_suggestion(self, player: str):
+    def initiate_suggestion(self, player: str, suggestion: dict) -> Dict:
         self.state["suggestion_starter"] = player
+        self.state["game_phase"] = GamePhase.SUGGESTION.value
+        self.state["suggestion"] = suggestion
+        self.next_to_disprove(player)
         return 
 
     def terminate_suggestion(self):

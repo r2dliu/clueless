@@ -297,9 +297,11 @@ function Controls() {
                                     websocket?.current?.send(
                                         JSON.stringify({
                                             type: "suggestion",
-                                            suspect: suggestionSuspect,
-                                            room: suggestionRoom,
-                                            weapon: suggestionWeapon,
+                                            suggestion: {
+                                                suspect: suggestionSuspect,
+                                                room: suggestionRoom,
+                                                weapon: suggestionWeapon,
+                                            }
                                         })
                                     );
                                 }
