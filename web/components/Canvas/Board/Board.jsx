@@ -8,11 +8,12 @@ import formatLabel from "@/components/helpers/utils";
 import getToken from "@/components/helpers/token";
 import { GameContext } from "@/components/helpers/GameContext";
 import styles from "./Board.module.scss";
+import Rules from "../Rules/Rules";
 
 import BoardGrid from "@/components/helpers/grid";
 import Cards from "./Cards";
 
-function Board() {
+function Board(props) {
   const { gameIdContext, clientIdContext, gameStateContext, websocket } =
     useContext(GameContext);
 
@@ -38,6 +39,8 @@ function Board() {
   // this is a action history for the incremental demo
   const [history, setHistory] = useState([]);
 
+  const openRulesDialog = () => props.setRulesOpen(true);
+  const closeRulesDialog = () => props.setRulesOpen(false);
 
   useEffect(() => {
     if (websocket.current) {
@@ -131,12 +134,23 @@ function Board() {
                 type: "start",
               })
             );
+            openRulesDialog();
           }}
         >
           Start Game
         </Button>
       )}
 
+
+      {gameState.game_phase === 1 && props.rulesOpen && (
+        <Rules rulesOpen={props.rulesOpen}
+                closeRulesDialog={closeRulesDialog}
+                openRulesDialog={openRulesDialog}/>
+      )}
+
+      {gameState.game_phase === 1 && !props.rulesOpen && (
+          <b>It is {formatLabel(gameState.current_turn)}&apos;s turn</b>
+      )}
       {/* display board */}
       {gameState.game_phase === 1 && (
 
