@@ -91,10 +91,11 @@ class Clueless:
             "concealed_scenario": {},
             "player_cards": {},  # dict of player: player's card list
             "visible_cards": [],  # list of cards shown to all players
+            "selectable_cards": {},  # cards that players can suggest/accuse
             "turn_order": [],  # player turn order
             "suggestion_starter": '',
-            "suggestion_order": [], # suggestion order
-            "next_to_disprove": '', # next suspect to disprove suggestion
+            "suggestion_order": [],  # suggestion order
+            "next_to_disprove": '',  # next suspect to disprove suggestion
             "current_turn": "miss_scarlet",  # player token
             "suggestion": {},  # holds current suggestion players must disprove
             "winner": {},  # holds the winner of the game
@@ -192,14 +193,28 @@ class Clueless:
         # front-end Cards.jsx uses cards_to_display only -- not separately displaying visible + player cards
         self.state["cards_to_display"] = {}
         for k, v in self.state["player_cards"].items():
-            self.state["cards_to_display"][k] = self.state["player_cards"][k] + self.state["visible_cards"]
+            self.state["cards_to_display"][k] = self.state["player_cards"][
+                k] + self.state["visible_cards"]
+
+        # Build lists of cards for suggestion/accusation
+        self.state["selectable_cards"]["rooms"] = self.rooms
+        self.state["selectable_cards"]["suspects"] = self.suspects
+        self.state["selectable_cards"]["weapons"] = self.weapons
+        for card in self.state["visible_cards"]:
+            if card in self.state["selectable_cards"]["rooms"]:
+                self.state["selectable_cards"]["rooms"].remove(card)
+            if card in self.state["selectable_cards"]["suspects"]:
+                self.state["selectable_cards"]["suspects"].remove(card)
+            if card in self.state["selectable_cards"]["weapons"]:
+                self.state["selectable_cards"]["weapons"].remove(card)
 
         # set turn order for the game
         self.state["turn_order"] = self.generate_turn_order()
 
-        # set suggestion order for the game -- copy at start ensures 
+        # set suggestion order for the game -- copy at start ensures
         # we include players who make incorrect accusations
-        self.state["suggestion_order"] = copy.deepcopy(self.state["turn_order"])
+        self.state["suggestion_order"] = copy.deepcopy(
+            self.state["turn_order"])
 
         # get first player to move
         for token in self.players:
@@ -227,7 +242,6 @@ class Clueless:
         values = [suspect, room, weapon]
 
         return dict(zip(keys, values))
-
 
     def distribute_cards(self) -> Tuple:
         """
@@ -316,7 +330,8 @@ class Clueless:
         self.state["previous_move"] = player + " ended_turn"
 
         if justAccused:
-            self.state["previous_move"] = player + " made an incorrect accusation! They are out of the game!"
+            self.state[
+                "previous_move"] = player + " made an incorrect accusation! They are out of the game!"
 
         self.state["current_turn"] = self.get_next_player(player)
         return self.state["current_turn"]
@@ -356,11 +371,11 @@ class Clueless:
         self.state["game_phase"] = GamePhase.SUGGESTION.value
         self.state["suggestion"] = suggestion
         self.next_to_disprove(player)
-        return 
+        return
 
     def terminate_suggestion(self):
         self.state["suggestion_starter"] = ''
-        return 
+        return
 
     def next_to_disprove(self, player: str) -> str:
         """ Updates game state with next character up to disprove suggestion """
