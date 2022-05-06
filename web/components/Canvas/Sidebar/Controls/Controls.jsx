@@ -23,35 +23,9 @@ function Controls(props) {
 
     const openRulesDialog = () => props.setRulesOpen(true);
 
-    const suspects = [
-        "colonel_mustard",
-        "miss_scarlet",
-        "professor_plum",
-        "mr_green",
-        "mrs_white",
-        "mrs_peacock",
-    ];
-
-    const rooms = [
-        "study",
-        "hall",
-        "lounge",
-        "library",
-        "billiard",
-        "dining",
-        "conservatory",
-        "ballroom",
-        "kitchen",
-    ];
-
-    const weapons = [
-        "rope",
-        "lead_pipe",
-        "knife",
-        "wrench",
-        "candlestick",
-        "revolver",
-    ];
+    const suspects = gameState?.selectable_cards?.suspects;
+    const rooms = gameState?.selectable_cards?.rooms;
+    const weapons = gameState?.selectable_cards?.weapons;
 
     const clientSuspect = (gameState?.assignments || {})[`${clientId}`];
     const currentRoom = (gameState?.suspect_locations || {})[clientSuspect];
@@ -92,26 +66,26 @@ function Controls(props) {
     function validateAccusationFields() {
         // only calling the hook once to avoid race condition
         let isSuspectValid = true, isRoomValid = true, isWeaponValid = true;
-        if(!accusationSuspect) isSuspectValid = false;
-        if(!accusationRoom) isRoomValid = false;
-        if(!accusationWeapon) isWeaponValid = false;
+        if (!accusationSuspect) isSuspectValid = false;
+        if (!accusationRoom) isRoomValid = false;
+        if (!accusationWeapon) isWeaponValid = false;
         setAccusationErrors({
-            "weapon" : !isWeaponValid,
-            "room" : !isRoomValid,
-            "suspect" : !isSuspectValid
+            "weapon": !isWeaponValid,
+            "room": !isRoomValid,
+            "suspect": !isSuspectValid
         })
     }
 
     function validateSuggestionFields() {
         // only calling the hook once to avoid race condition
         let isSuspectValid = true, isRoomValid = true, isWeaponValid = true;
-        if(!suggestionSuspect) isSuspectValid = false;
-        if(!suggestionRoom) isRoomValid = false;
-        if(!suggestionWeapon) isWeaponValid = false;
+        if (!suggestionSuspect) isSuspectValid = false;
+        if (!suggestionRoom) isRoomValid = false;
+        if (!suggestionWeapon) isWeaponValid = false;
         setSuggestionErrors({
-            "weapon" : !isWeaponValid,
-            "room" : !isRoomValid,
-            "suspect" : !isSuspectValid
+            "weapon": !isWeaponValid,
+            "room": !isRoomValid,
+            "suspect": !isSuspectValid
         })
     }
 
@@ -306,7 +280,7 @@ function Controls(props) {
                             key={`submit-suggestion`}
                             variant="contained"
                             onClick={() => {
-                                if(suggestionRoom && suggestionSuspect && suggestionWeapon) {
+                                if (suggestionRoom && suggestionSuspect && suggestionWeapon) {
                                     websocket?.current?.send(
                                         JSON.stringify({
                                             type: "suggestion",
@@ -428,14 +402,14 @@ function Controls(props) {
                             variant="contained"
                             onClick={() => {
                                 if (accusationSuspect && accusationRoom && accusationWeapon) {
-                                  websocket?.current?.send(
-                                    JSON.stringify({
-                                      type: "accusation",
-                                      suspect: accusationSuspect,
-                                      room: accusationRoom,
-                                      weapon: accusationWeapon,
-                                    })
-                                  );
+                                    websocket?.current?.send(
+                                        JSON.stringify({
+                                            type: "accusation",
+                                            suspect: accusationSuspect,
+                                            room: accusationRoom,
+                                            weapon: accusationWeapon,
+                                        })
+                                    );
                                 } else {
                                     validateAccusationFields()
                                 }
