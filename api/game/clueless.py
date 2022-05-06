@@ -93,6 +93,7 @@ class Clueless:
             "turn_order": [],  # player turn order
             "suggestion_starter": '',
             "suggestion_order": [], # suggestion order
+            "suggestion_disproval_card": '', # the card that disproved the suggestion
             "next_to_disprove": '', # next suspect to disprove suggestion
             "current_turn": "miss_scarlet",  # player token
             "suggestion": {},  # holds current suggestion players must disprove
@@ -352,13 +353,31 @@ class Clueless:
 
     def initiate_suggestion(self, player: str, suggestion: dict) -> Dict:
         self.state["suggestion_starter"] = player
+        self.state["suggestion_disproval_card"] = ''
         self.state["game_phase"] = GamePhase.SUGGESTION.value
         self.state["suggestion"] = suggestion
         self.next_to_disprove(player)
         return 
 
+        
+    def getValidcards(self, player: str, suggestion: dict) -> List:
+        playersCards = self.state.player_cards[player]
+        suggestionCards = suggestion.values()
+        overlap = list(set(playersCards) & set(suggestionCards))
+        return overlap
+
+    def disprove_suggestion(self, player, card) -> Dict:
+        # suggestion was disproven, advance the game
+        if(card is not None):
+            self.terminate_suggestion()
+            self.rotate_next_player(player, False)
+            self.state["suggestion_disproval_card"] = card
+        else:
+            self.next_to_disprove(player)
+
     def terminate_suggestion(self):
         self.state["suggestion_starter"] = ''
+        self.state["game_phase"] = GamePhase.IN_PROGRESS.value
         return 
 
     def next_to_disprove(self, player: str) -> str:

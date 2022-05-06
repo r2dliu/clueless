@@ -6,7 +6,7 @@ from connection_manager import ConnectionManager
 from uuid import UUID, uuid4
 import json
 from typing import Optional
-from game.clueless import Clueless
+from game.clueless import Clueless, GamePhase
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -106,20 +106,40 @@ async def websocket_connection(websocket: WebSocket, game_uuid: str,
                             await connection_manager.send_personal_message(
                                 json.dumps({"type": "turn_error"}), websocket)
 
-                    # Player suggestion
+                    # start suggestion
                     elif (data["type"] == "suggestion"):
                         # Validate turn order
                         if (message["current_turn"] == clientSuspect):
                             # Handle suggestion 
                             game.initiate_suggestion(clientSuspect, data["suggestion"])
+                            validCards = game.getValidcards(data["next_to_disprove"], data["suggestion"])
+                            await connection_manager.broadcast(
+                                json.dumps({"type": "validCards", "cards":  json.dumps(validCards)}), websocket)
                         else:
                             await connection_manager.send_personal_message(
                                 json.dumps({"type": "turn_error"}), websocket)
                     
+
+                    elif (data["type"] == "disprove_suggestion"):
+                        game.disprove_suggestion(clientSuspect, data.get("card", None))
+                        newState = game.get_state()
+
+                        # the suggestion is still going
+                        if(newState.game_phase == GamePhase.SUGGESTION.value):
+                            await connection_manager.broadcast(
+                                json.dumps({"type": "validCards", "cards":  json.dumps(validCards)}), websocket)
+
                     # Suggestion cycle
                     # front end caller should update suggestion_actor as cycle continues
                     # break when full circle msg is sent
+                    # counter suggestion
                     elif (data["type"] == "next_to_disprove"):
+                        # check gamestate for current players cards
+                        # send websocket message that conatins any cards that match the suggestion
+                        validCards = game.getValidcards(data["next_to_disprove"], data["suggestion"])
+                        await connection_manager.send_personal_message(
+                                json.dumps({"type": "validCards", "cards":  json.dumps(validCards)}), websocket)
+
                         next_up = game.next_to_disprove(data["suggestion_actor"])
                         # has every player attempted to disprove?
                         if next_up == message["suggestion_starter"]:
