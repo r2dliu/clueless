@@ -80,6 +80,9 @@ function Board(props) {
 
 
       {/* character select images */}
+      {gameState.game_phase === 0 && (
+        <div>{`Select Your Character`}</div>
+      )}
       < CharSelect />
 
 

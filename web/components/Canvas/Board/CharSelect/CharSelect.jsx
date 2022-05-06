@@ -2,13 +2,19 @@ import React, { useState, useEffect, useContext } from "react";
 import {
   Card,
   CardMedia,
-  CardActions,
-  CardContent,
-  Button,
+  ButtonBase,
 } from "@mui/material";
 import { GameContext } from "@/components/helpers/GameContext";
 import styles from "./CharSelect.module.scss";
 
+
+function SuspectImage({ name }) {
+  return (
+    <div className={styles.suspect}>
+      <CardMedia component={"img"} src={`/static/board/${name}.jpg`} />
+    </div>
+  );
+}
 
 function CharSelect() {
   const { gameIdContext, clientIdContext, gameStateContext, websocket } =
@@ -17,9 +23,8 @@ function CharSelect() {
   const [gameId, _setGameId] = gameIdContext;
   const [clientId, _setClientId] = clientIdContext;
   const [gameState, setGameState] = gameStateContext;
-  // { suspect: player }
+  const [history, setHistory] = useState([]);
   const [assignments, setAssignments] = useState({});
-  const character = (gameState?.assignments || {})[clientId];
   const suspects = [
     "colonel_mustard",
     "miss_scarlet",
@@ -56,31 +61,27 @@ function CharSelect() {
         {suspects.map((suspect) => (
           <Card sx={{
           }}>
-            <CardMedia
-              component={"img"}
-              src={`/static/board/${suspect}.jpg`}
-            ></CardMedia>
-            <CardActions>
-              <Button
-                key={`suspect-${suspect}`}
-                variant="outlined"
-                onClick={() => {
-                  websocket?.current?.send(
-                    JSON.stringify({
-                      type: "select_character",
-                      clientId: clientId,
-                      character_token: suspect,
-                    })
-                  );
-                }}
-                disabled={assignments[suspect]}
-              >
-                {suspect}
-              </Button>
-            </CardActions>
+            <ButtonBase
+              key={`suspect-${suspect}`}
+              variant="outlined"
+              onClick={() => {
+                websocket?.current?.send(
+                  JSON.stringify({
+                    type: "select_character",
+                    clientId: clientId,
+                    character_token: suspect,
+                  })
+                );
+              }}
+              disabled={assignments[suspect]}
+            >
+              <SuspectImage name={suspect}></SuspectImage>
+
+            </ButtonBase>
           </Card>
-        ))}
-      </div>
+        ))
+        }
+      </div >
     )
   );
 }
