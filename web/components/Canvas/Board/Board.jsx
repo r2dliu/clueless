@@ -66,14 +66,6 @@ function Board(props) {
   }, [websocket]);
 
   useEffect(() => {
-    if (
-      typeof gameState?.previous_move === "string" ||
-      gameState?.previous_move instanceof String
-    ) {
-      console.log(gameState?.previous_move);
-      setHistory((history) => [...history, gameState?.previous_move]);
-    }
-
     if (gameState?.game_phase === 0) {
       let newAssignments = {};
       for (const player in gameState?.assignments) {
@@ -185,13 +177,13 @@ function Board(props) {
           <div>Game Over! {formatLabel(gameState?.winner)} won!</div>
         )
       }
-      
+
       {
         gameState.game_phase === 3 && (
           <div>Game Over! Nobody wins!</div>
-      )
+        )
       }
-      
+
       <Cards />
     </div >
   );

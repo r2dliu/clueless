@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import { GameContext } from "@/components/helpers/GameContext";
+import styles from "./Chat.module.scss";
 import { TextField, Chip } from "@mui/material";
+
 
 function Chat() {
   const [messages, setMessages] = useState([]);
@@ -19,7 +21,9 @@ function Chat() {
       gameState?.previous_move instanceof String
     ) {
       console.log(gameState?.previous_move);
-      setHistory((history) => [...history, gameState?.previous_move]);
+      if (history[history.length - 1] != gameState?.previous_move) {
+        setHistory((history) => [...history, gameState?.previous_move]);
+      }
     }
   }, [gameState]);
 
@@ -44,33 +48,53 @@ function Chat() {
       });
     }
   }, [websocket]);
+
   // TODO: action history isn't right..updates every time somebody chats
   return (
     <div>
-      <b>chat</b>
-      {messages.map((message, i) => (
-        <p key={i}>{message}</p>
-      ))}
-      {history.map((action) => (
-        <Chip label={action} variant="outlined" key={action} />
-      ))}
-      <TextField
-        inputRef={chatInputRef}
-        id="chat"
-        variant="outlined"
-        onKeyPress={(e) => {
-          if (e.key === "Enter" && !!chatInputRef.current.value) {
-            websocket?.current?.send(
-              JSON.stringify({
-                type: "chat",
-                chat: chatInputRef.current.value,
-                clientId: clientId,
-              })
-            );
-            chatInputRef.current.value = "";
-          }
-        }}
-      />
+      <div className={styles.Chat}>
+        <div className={styles.messagesWrapper}>
+          <div className={styles.messageBox}>
+            {messages.map((message, i) => (
+              <p key={i}>{message}</p>
+            ))}
+          </div>
+        </div>
+
+        <TextField
+          inputRef={chatInputRef}
+          id="chat"
+          variant="outlined"
+          label="Chat"
+          size="small"
+          onKeyPress={(e) => {
+            if (e.key === "Enter" && !!chatInputRef.current.value) {
+              websocket?.current?.send(
+                JSON.stringify({
+                  type: "chat",
+                  chat: chatInputRef.current.value,
+                  clientId: clientId,
+                })
+              );
+              chatInputRef.current.value = "";
+            }
+          }}
+        />
+      </div>
+      <br></br>
+      <br></br>
+      <div className={styles.MoveHistory}>
+        <b>Move History</b>
+        <div className={styles.messagesWrapper}>
+          <div className={styles.messageBox}>
+            {history.map((action) => (
+              // Chip is too big to fit in the chatbox :(
+              //<Chip label={action} variant="outlined" key={action} />
+              <p>{action}</p>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
