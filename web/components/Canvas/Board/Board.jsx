@@ -1,8 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import {
   Button,
-  Box,
-  Chip,
+
 } from "@mui/material";
 import formatLabel from "@/components/helpers/utils";
 import getToken from "@/components/helpers/token";
@@ -12,6 +11,8 @@ import Rules from "../Rules/Rules";
 
 import BoardGrid from "@/components/helpers/grid";
 import Cards from "./Cards";
+import CharSelect from "./CharSelect";
+
 
 function Board(props) {
   const { gameIdContext, clientIdContext, gameStateContext, websocket } =
@@ -65,63 +66,22 @@ function Board(props) {
     }
   }, [websocket]);
 
-  useEffect(() => {
-    if (
-      typeof gameState?.previous_move === "string" ||
-      gameState?.previous_move instanceof String
-    ) {
-      console.log(gameState?.previous_move);
-      setHistory((history) => [...history, gameState?.previous_move]);
-    }
-
-    if (gameState?.game_phase === 0) {
-      let newAssignments = {};
-      for (const player in gameState?.assignments) {
-        newAssignments[`${gameState?.assignments[player]}`] = player;
-      }
-      setAssignments(newAssignments);
-      console.log(newAssignments);
-    }
-
-  }, [gameState]);
-
   return (
     <div className={styles.Board}>
-      {/* message dump */}
-      <div>{`you are: ${clientId}`}</div>
-      <div>{`gameid: ${gameId}`}</div>
-      {/*
-        <div className={styles.state}>{`gamestate: ${JSON.stringify(
-          gameState
-        )}`}</div>
-      */}
 
-      {/* character selection */}
+      {/* message dump */}
       {gameState.game_phase === 0 && (
-        <div>
-          <b>Select Character</b>
-          <br></br>
-          {suspects.map((suspect) => (
-            <Button
-              key={`suspect-${suspect}`}
-              variant="outlined"
-              onClick={() => {
-                websocket?.current?.send(
-                  JSON.stringify({
-                    type: "select_character",
-                    clientId: clientId,
-                    character_token: suspect,
-                  })
-                );
-              }}
-              disabled={assignments[suspect]}
-            >
-              {suspect}
-            </Button>
-          ))}
-        </div>
+        <div>{`you are: ${clientId}`}</div>
+      )}
+      {gameState.game_phase === 0 && (
+        <div>{`gameid: ${gameId}`}</div>
       )}
       <br />
+
+
+      {/* character select images */}
+      < CharSelect />
+
 
       {/* starting game */}
       {gameState.game_phase === 0 && (
@@ -144,13 +104,11 @@ function Board(props) {
 
       {gameState.game_phase === 1 && props.rulesOpen && (
         <Rules rulesOpen={props.rulesOpen}
-                closeRulesDialog={closeRulesDialog}
-                openRulesDialog={openRulesDialog}/>
+          closeRulesDialog={closeRulesDialog}
+          openRulesDialog={openRulesDialog} />
       )}
 
-      {gameState.game_phase === 1 && !props.rulesOpen && (
-          <b>It is {formatLabel(gameState.current_turn)}&apos;s turn</b>
-      )}
+
       {/* display board */}
       {gameState.game_phase === 1 && (
 
@@ -185,13 +143,13 @@ function Board(props) {
           <div>Game Over! {formatLabel(gameState?.winner)} won!</div>
         )
       }
-      
+
       {
         gameState.game_phase === 3 && (
           <div>Game Over! Nobody wins!</div>
-      )
+        )
       }
-      
+
       <Cards />
     </div >
   );
