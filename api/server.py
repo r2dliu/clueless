@@ -1,6 +1,7 @@
 # from typing import Optional
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.staticfiles import StaticFiles
 from connection_manager import ConnectionManager
 from uuid import UUID, uuid4
 import json
@@ -8,6 +9,7 @@ from typing import Optional
 from game.clueless import Clueless
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
 connection_manager = ConnectionManager()
 games_by_id = {}
 
@@ -116,7 +118,7 @@ async def websocket_connection(websocket: WebSocket, game_uuid: str,
 
                     # End turn
                     elif (data["type"] == "end_turn"):
-                        game.rotate_next_player(clientSuspect)
+                        game.rotate_next_player(clientSuspect, False)
 
                     # handle other types of messages
                     # pick character

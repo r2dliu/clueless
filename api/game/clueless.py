@@ -9,6 +9,7 @@ class GamePhase(Enum):
     NOT_STARTED = 0
     IN_PROGRESS = 1
     COMPLETED = 2
+    ENDED = 3  # Everyone failed their accusations
 
 
 class Clueless:
@@ -213,16 +214,15 @@ class Clueless:
 
         return dict(zip(keys, values))
 
-    """
-    Shuffles and evenly distributes cards amongst players
-
-    Returns:
-        A dict containing {player: [cards]} pairs for each individual
-            player and a list of extra cards to be displayed to all players
-    """
 
     def distribute_cards(self) -> Tuple:
+        """
+        Shuffles and evenly distributes cards amongst players
 
+        Returns:
+            A dict containing {player: [cards]} pairs for each individual
+                player and a list of extra cards to be displayed to all players
+        """
         # ensure case file has been filled
         assert self.state["concealed_scenario"]
 
@@ -299,8 +299,12 @@ class Clueless:
 
         return next_player
 
-    def rotate_next_player(self, player: str) -> str:
+    def rotate_next_player(self, player: str, justAccused: bool) -> str:
         self.state["previous_move"] = player + " ended_turn"
+
+        if justAccused:
+            self.state["previous_move"] = player + " made an incorrect accusation! They are out of the game!"
+
         self.state["current_turn"] = self.get_next_player(player)
         return self.state["current_turn"]
 
@@ -319,10 +323,12 @@ class Clueless:
             self.state["winner"] = player
             self.state["game_phase"] = GamePhase.COMPLETED.value
         else:
-            self.state[
-                "previous_move"] = player + " made an incorrect accusation"
-            self.rotate_next_player(player)
+            self.rotate_next_player(player, True)
             self.state["turn_order"].remove(player)
+
+        # End the game if all players are removed from turn order
+        if not self.state["turn_order"]:
+            self.state["game_phase"] = GamePhase.ENDED.value
 
     def move(self, player: str, location: str) -> Dict:
         if location in self.allowed_moves(player):
