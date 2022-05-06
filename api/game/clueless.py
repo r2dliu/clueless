@@ -197,16 +197,12 @@ class Clueless:
                 k] + self.state["visible_cards"]
 
         # Build lists of cards for suggestion/accusation
-        self.state["selectable_cards"]["rooms"] = self.rooms
-        self.state["selectable_cards"]["suspects"] = self.suspects
-        self.state["selectable_cards"]["weapons"] = self.weapons
-        for card in self.state["visible_cards"]:
-            if card in self.state["selectable_cards"]["rooms"]:
-                self.state["selectable_cards"]["rooms"].remove(card)
-            if card in self.state["selectable_cards"]["suspects"]:
-                self.state["selectable_cards"]["suspects"].remove(card)
-            if card in self.state["selectable_cards"]["weapons"]:
-                self.state["selectable_cards"]["weapons"].remove(card)
+        self.state["selectable_cards"]["rooms"] = list(
+            set(self.rooms).difference(set(self.state["visible_cards"])))
+        self.state["selectable_cards"]["suspects"] = list(
+            set(self.suspects).difference(set(self.state["visible_cards"])))
+        self.state["selectable_cards"]["weapons"] = list(
+            set(self.weapons).difference(set(self.state["visible_cards"])))
 
         # set turn order for the game
         self.state["turn_order"] = self.generate_turn_order()
