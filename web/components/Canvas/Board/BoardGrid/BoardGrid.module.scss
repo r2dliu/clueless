@@ -1,0 +1,50 @@
+.BoardGrid {
+  display: flex;
+  position: relative;
+  bottom: 0;
+  left: 120;
+  justify-content: center;
+}
+
+
+.colonelMustard,
+.missScarlet,
+.professorPlum,
+.mrGreen,
+.mrsWhite,
+.mrsPeacock,
+.debug {
+  position: absolute;
+  height: 25px;
+  width: 25px;
+  border-radius: 20px;
+  border: 2px solid white
+}
+
+.mrsWhite {
+  background-color: lightslategrey;
+}
+
+.missScarlet {
+  background-color: red;
+}
+
+.colonelMustard {
+  background-color: rgb(255, 196, 0);
+}
+
+.mrGreen {
+  background-color: green;
+}
+
+.professorPlum {
+  background-color: purple;
+}
+
+.mrsPeacock {
+  background-color: navy;
+}
+
+.debug {
+  background-color: black; //rgb(0, 0, 0, 0);
+}
