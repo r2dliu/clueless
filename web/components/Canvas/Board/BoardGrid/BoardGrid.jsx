@@ -10,7 +10,22 @@ import styles from "./BoardGrid.module.scss";
 
 
 
-function Token({ sus_locs, tile_name }) {
+function Token({ sus, tile_name }) {
+
+
+  return (
+    <div
+      style={{
+        bottom: 64,
+        right: 70
+      }}
+      className={styles[getToken(sus)]}
+    ></div>
+  );
+}
+
+function Tile({ sus_locs, tile_name }) {
+
 
   //Create dictionary of tokens
   var room_tokens = {
@@ -40,18 +55,8 @@ function Token({ sus_locs, tile_name }) {
   //assign suspect token to corresponding location in room_tokens dictionary
   for (var suspect in sus_locs) { room_tokens[sus_locs[suspect]] = suspect; }
 
+  const suspects_on_tile = [room_tokens[`${tile_name}`]];
 
-  return (
-    <div style={{
-      bottom: 64,
-      right: 70,
-    }}
-      className={styles[getToken(room_tokens[`${tile_name}`])]}
-    ></div>
-  );
-}
-
-function Tile({ sus_locs, tile_name }) {
   return (
     < Grid item xs={2}
       sx={{
@@ -59,7 +64,9 @@ function Tile({ sus_locs, tile_name }) {
       }} >
 
       <CardMedia component={"img"} src={`/static/tiles/${tile_name}.jpg`} />
-      <Token sus_locs={sus_locs} tile_name={tile_name} />
+      {suspects_on_tile.map((sus) => (
+        <Token sus={sus} tile_name={tile_name} />
+      ))}
     </Grid >
 
   );
@@ -86,7 +93,7 @@ function BoardGrid() {
     "blank",
     "hall_billiard",
     "blank",
-    "library_study", // end row 2
+    "lounge_dining", // end row 2
     "library",
     "library_billiard",
     "billiard",
