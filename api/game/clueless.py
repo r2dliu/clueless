@@ -381,13 +381,15 @@ class Clueless:
 
     def disprove_suggestion(self, player, card) -> Dict:
         # TODO validate answer - tbh we probably don't need to worry about this for the project
+        # if(card != "none" and card not in self.get_valid_cards(player)):
+        #     print("cheater cheater pumpkin eater, you lose")
 
         # suggestion was disproven, advance the game
         if(card != "none"):
+            self.state["suggestion_disproval_card"] = card
             self.terminate_suggestion()
             # current player's turn is over, move turns
-            self.rotate_next_player(player, False)
-            self.state["suggestion_disproval_card"] = card
+            self.rotate_next_player(self.state["current_turn"], False)
         # player passed
         else:
             self.next_to_disprove(player)
@@ -396,7 +398,6 @@ class Clueless:
 
     def terminate_suggestion(self):
         self.state["suggestion"] = {}
-        self.state["suggestion_disproval_card"] = ''
         self.state["is_active_suggestion"] = False
         return 
 

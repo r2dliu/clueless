@@ -31,6 +31,15 @@ function Suggestion(props) {
     );
   };
 
+  function selectCard(name) {
+    websocket?.current?.send(
+      JSON.stringify({
+        type: "disprove_suggestion",
+        card: name,
+      })
+    );
+  };
+
   return (
     <div>
        <Dialog
@@ -65,13 +74,17 @@ function Suggestion(props) {
                   {`Your Cards`}
                 </Typography>
               </DialogContentText>
-              <Cards cards={playersCards}/>
+              <Cards cards={playersCards}
+                     isClickable={true}
+                     onClick={selectCard}
+                     validCards={gameState?.suggestion_valid_cards}
+              />
 
             </DialogContent>
             <DialogActions>
               <Button 
                       onClick={passSuggestion}
-                      // disabled={gameState?.suggestion_valid_cards?.length > 0}
+                      disabled={gameState?.suggestion_valid_cards?.length > 0}
                       variant="contained">
                         Pass
               </Button>

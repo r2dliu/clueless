@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useContext } from "react";
 import { GameContext } from "@/components/helpers/GameContext";
 import styles from "./Cards.module.scss";
-import { CardMedia } from "@mui/material";
+import PropTypes, { array, func } from 'prop-types';
+import { CardActionArea, CardMedia } from "@mui/material";
 
 function Card({ name }) {
   return (
@@ -26,11 +27,25 @@ function Cards(props) {
     gameState.game_phase === 1 && (
       <div className={styles.Cards}>
         {cards.map((name) => (
-          <Card key={name} name={name} />
+          <CardActionArea disabled={!props?.isClickable && !gameState?.suggestion_valid_cards?.includes(name)}
+                          onClick={() => {
+                            if(props?.isClickable && gameState?.suggestion_valid_cards?.includes(name)) {
+                              props?.onClick(name)
+                            }
+                          }}
+                          key={name}>
+            <Card key={name} name={name} />
+          </CardActionArea>
         ))}
       </div>
     )
   );
+}
+
+Cards.propTypes = {
+  isClickable: PropTypes.bool,
+  onClick: func,
+  validCards: array,
 }
 
 export default Cards;
