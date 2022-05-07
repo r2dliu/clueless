@@ -96,6 +96,7 @@ class Clueless:
             "suggestion_order": [], # suggestion order
             "suggestion_disproval_card": '', # the card that disproved the suggestion
             "suggestion_valid_cards": [], # valid cards to disprove current suggestion
+            "suggestion_all_passed": False, # everyone passed the suggestion
             "is_active_suggestion": False,
             "next_to_disprove": '', # next suspect to disprove suggestion
             "current_turn": "miss_scarlet",  # player token
@@ -392,14 +393,19 @@ class Clueless:
             # current player's turn is over, move turns
             self.rotate_next_player(self.state["current_turn"], False)
         # player passed
-        else:
-            self.next_to_disprove(player)
+        else:            
             nextPlayerToDisprove = self.next_to_disprove(player)
             self.state["suggestion_valid_cards"] = self.get_valid_cards(nextPlayerToDisprove, self.state["suggestion"])
+
+            # handle full circle
+            if(nextPlayerToDisprove == self.state["suggestion_starter"]):
+                self.terminate_suggestion()
+                self.state["suggestion_all_passed"] = True
 
     def terminate_suggestion(self):
         self.state["suggestion"] = {}
         self.state["is_active_suggestion"] = False
+        self.rotate_next_player(self.state["suggestion_starter"], False)
         return 
 
     def next_to_disprove(self, player: str) -> str:
