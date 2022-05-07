@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
-import { CardMedia } from "@mui/material";
-import formatLabel from "@/components/helpers/utils";
 import { GameContext } from "@/components/helpers/GameContext";
 import styles from "./Cards.module.scss";
+import { CardMedia } from "@mui/material";
 
 function Card({ name }) {
   return (
@@ -12,7 +11,7 @@ function Card({ name }) {
   );
 }
 
-function Cards() {
+function Cards(props) {
   const { gameIdContext, clientIdContext, gameStateContext, websocket } =
     useContext(GameContext);
 
@@ -21,12 +20,11 @@ function Cards() {
   const [gameState, setGameState] = gameStateContext;
 
   const character = (gameState?.assignments || {})[clientId];
-  const cards = (gameState?.cards_to_display || {})[character] || [];
+  const cards = props.cards ?  props.cards : (gameState?.cards_to_display || {})[character] || [];
 
   return (
     gameState.game_phase === 1 && (
       <div className={styles.Cards}>
-        test
         {cards.map((name) => (
           <Card key={name} name={name} />
         ))}

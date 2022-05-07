@@ -110,24 +110,15 @@ async def websocket_connection(websocket: WebSocket, game_uuid: str,
                     elif (data["type"] == "suggestion"):
                         # Validate turn order
                         if (message["current_turn"] == clientSuspect):
-                            # Handle suggestion 
-                            nextToDisprove = game.initiate_suggestion(clientSuspect, data["suggestion"])
-                            validCards = game.getValidcards(nextToDisprove, data["suggestion"])
-                            # await connection_manager.broadcast(
-                            #     json.dumps({"type": "validCards", "cards":  json.dumps(validCards)}), websocket)
+                            # Handle suggestion
+                            game.initiate_suggestion(clientSuspect, data["suggestion"])
                         else:
                             await connection_manager.send_personal_message(
                                 json.dumps({"type": "turn_error"}), websocket)
                     
 
                     elif (data["type"] == "disprove_suggestion"):
-                        game.disprove_suggestion(clientSuspect, data.get("card", None))
-                        newState = game.get_state()
-
-                        # the suggestion is still going
-                        if(newState.game_phase == GamePhase.SUGGESTION.value):
-                            await connection_manager.broadcast(
-                                json.dumps({"type": "validCards", "cards":  json.dumps(validCards)}), websocket)
+                        game.disprove_suggestion(clientSuspect, data["card"])
 
                     # Suggestion cycle
                     # front end caller should update suggestion_actor as cycle continues

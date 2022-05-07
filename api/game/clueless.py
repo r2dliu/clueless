@@ -95,6 +95,7 @@ class Clueless:
             "suggestion_starter": '',
             "suggestion_order": [], # suggestion order
             "suggestion_disproval_card": '', # the card that disproved the suggestion
+            "suggestion_valid_cards": [], # valid cards to disprove current suggestion
             "is_active_suggestion": False,
             "next_to_disprove": '', # next suspect to disprove suggestion
             "current_turn": "miss_scarlet",  # player token
@@ -362,15 +363,16 @@ class Clueless:
         # else:
         # todo return error?
 
-    def initiate_suggestion(self, player: str, suggestion: dict) -> Dict:
+    def initiate_suggestion(self, player: str, suggestion: dict):
         self.state["suggestion_starter"] = player
         self.state["suggestion_disproval_card"] = ''
         self.state["is_active_suggestion"] = True
         self.state["suggestion"] = suggestion
-        return self.next_to_disprove(player)
+        nextPlayerToDisprove = self.next_to_disprove(player)
+        self.state["suggestion_valid_cards"] = self.get_valid_cards(nextPlayerToDisprove, suggestion)
 
         
-    def getValidcards(self, player: str, suggestion: dict) -> List:
+    def get_valid_cards(self, player: str, suggestion: dict) -> List:
         playersCards = set(self.state['player_cards'][player])
 
         suggestionCards = set(suggestion.values())
@@ -378,16 +380,23 @@ class Clueless:
         return list(overlap)
 
     def disprove_suggestion(self, player, card) -> Dict:
+        # TODO validate answer - tbh we probably don't need to worry about this for the project
+
         # suggestion was disproven, advance the game
-        if(card is not None):
+        if(card != "none"):
             self.terminate_suggestion()
+            # current player's turn is over, move turns
             self.rotate_next_player(player, False)
             self.state["suggestion_disproval_card"] = card
+        # player passed
         else:
             self.next_to_disprove(player)
+            nextPlayerToDisprove = self.next_to_disprove(player)
+            self.state["suggestion_valid_cards"] = self.get_valid_cards(nextPlayerToDisprove, self.state["suggestion"])
 
     def terminate_suggestion(self):
-        self.state["suggestion_starter"] = ''
+        self.state["suggestion"] = {}
+        self.state["suggestion_disproval_card"] = ''
         self.state["is_active_suggestion"] = False
         return 
 
