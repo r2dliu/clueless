@@ -11,13 +11,43 @@ import styles from "./BoardGrid.module.scss";
 
 
 function Token({ sus, tile_name }) {
+  var y_coord = 64;
+  var x_coord = 70;
 
+  if (sus === 'colonel_mustard') {
+    y_coord = 64;
+    x_coord = 70;
+  }
+  else if (sus === 'miss_scarlet') {
+    y_coord = 64;
+    x_coord = 80;
+  }
+  else if (sus === 'professor_plum') {
+    y_coord = 64;
+    x_coord = 90;
+  }
+  else if (sus === 'mr_green') {
+    y_coord = 74;
+    x_coord = 70;
+  }
+  else if (sus === 'mrs_white') {
+    y_coord = 84;
+    x_coord = 80;
+  }
+  else if (sus === 'mrs_peacock') {
+    y_coord = 94;
+    x_coord = 90;
+  }
+  else if (sus === '') {
+    y_coord = 64;
+    x_coord = 76;
+  }
 
   return (
     <div
       style={{
-        bottom: 64,
-        right: 70
+        bottom: y_coord,
+        right: x_coord,
       }}
       className={styles[getToken(sus)]}
     ></div>
@@ -26,36 +56,15 @@ function Token({ sus, tile_name }) {
 
 function Tile({ sus_locs, tile_name }) {
 
+  // get all suspects on tile
+  let suspects_on_tile = [];
+  for (var suspect in sus_locs) {
 
-  //Create dictionary of tokens
-  var room_tokens = {
-    "kitchen": "",
-    "study": "",
-    "hall": "",
-    "lounge": "",
-    "library": "",
-    "billiard": "",
-    "dining": "",
-    "conservatory": "",
-    "ballroom": "",
-    "study_hall": "",
-    "lounge_dining": "",
-    "hall_lounge": "",
-    "dining_kitchen": "",
-    "kitchen_ballroom": "",
-    "ballroom_conservatory": "",
-    "conservatory_library": "",
-    "library_study": "",
-    "hall_billiard": "",
-    "dining_billiard": "",
-    "ballroom_billiard": "",
-    "library_billiard": "",
+    if (sus_locs[suspect] == tile_name) {
+      suspects_on_tile.push(suspect);
+    }
+
   }
-
-  //assign suspect token to corresponding location in room_tokens dictionary
-  for (var suspect in sus_locs) { room_tokens[sus_locs[suspect]] = suspect; }
-
-  const suspects_on_tile = [room_tokens[`${tile_name}`]];
 
   return (
     < Grid item xs={2}
