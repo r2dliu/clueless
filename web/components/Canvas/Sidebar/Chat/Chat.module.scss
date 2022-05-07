@@ -1,0 +1,60 @@
+// Chat and MoveHistory are almost the same except for the height
+// Sorry I have no patience to deal with CSS and don't feel like
+// making this page pretty
+.Chat {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: stretch;
+
+    float: right;
+    width: 250px;
+    height: 300px;
+    padding: 3px;
+    border: 1px solid #00695c;
+    border-radius: 5px;
+
+    .messagesWrapper {
+        width: 250px;
+        max-width: 250px;
+        overflow: auto;
+        display: flex;
+        flex-direction: column-reverse;
+    }
+
+    .messageBox {
+        overflow-wrap: break-word;
+        text-align: left;
+        flex: none;
+    }
+}
+
+.MoveHistory {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: stretch;
+
+    float: right;
+    width: 250px;
+    height: 200px;
+    padding: 3px;
+    border: 1px solid #00695c;
+    border-radius: 5px;
+
+    .messagesWrapper {
+        width: 250px;
+        max-width: 250px;
+        overflow: auto;
+        display: flex;
+        flex-direction: column-reverse;
+    }
+
+    .messageBox {
+        overflow-wrap: break-word;
+        text-align: left;
+        flex: none;
+    }
+}

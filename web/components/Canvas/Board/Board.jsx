@@ -66,6 +66,7 @@ function Board(props) {
     }
   }, [websocket]);
 
+
   return (
     <div className={styles.Board}>
 
