@@ -368,6 +368,7 @@ class Clueless:
         self.state["suggestion_disproval_card"] = ''
         self.state["is_active_suggestion"] = True
         self.state["suggestion"] = suggestion
+        self.state["suspect_locations"][suggestion["suspect"]] = suggestion["room"]
         nextPlayerToDisprove = self.next_to_disprove(player)
         self.state["suggestion_valid_cards"] = self.get_valid_cards(nextPlayerToDisprove, suggestion)
 
