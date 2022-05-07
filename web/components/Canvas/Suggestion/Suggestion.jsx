@@ -4,6 +4,7 @@ import {
 } from "@mui/material";
 import { GameContext } from "@/components/helpers/GameContext";
 import styles from "./Suggestion.module.scss";
+import formatLabel from "@/components/helpers/utils";
 
 function Suggestion(props) {
   const { gameIdContext, clientIdContext, gameStateContext, } =
@@ -16,15 +17,15 @@ function Suggestion(props) {
   return (
     <div>
        <Dialog
-        open={props.rulesOpen}
-        onClose={props.closeRulesDialog}
+        open={gameState.is_active_suggestion}
+        onClose={!gameState.is_active_suggestion}
       >
 
         {/* it's your turn to disprove */}
-        {clientId == props.suggestionTurn && (
+        {gameState.assignments[clientId] == gameState.next_to_disprove && (
           <div>
             <DialogTitle>
-            {props.currentTurn + " just made a suggestion. It's currently your turn to disprove it."}
+            {formatLabel(gameState.current_turn) + " made a suggestion. It's currently your turn to disprove it."}
             </DialogTitle>
             <DialogContent dividers>
               <DialogContentText>
@@ -39,8 +40,9 @@ function Suggestion(props) {
 
             </DialogContent>
             <DialogActions>
-              <Button onClick={props.pass}
-                      disabled={props.canPass}
+              <Button 
+                      // onClick={props.pass}
+                      // disabled={props.canPass}
                       variant="contained">
                         Pass
               </Button>
@@ -49,10 +51,10 @@ function Suggestion(props) {
         )}
 
         {/* it's someone else's turn */}
-        {clientId != props.suggestionTurn && (
+        {gameState.assignments[clientId] != gameState.next_to_disprove && (
           <div>
             <DialogTitle>
-            {props.currentTurn + " just made a suggestion. It's currently " + props.suggestionTurn + " to disprove it."}
+            {formatLabel(gameState.current_turn) + " made a suggestion. It's currently " + formatLabel(gameState.next_to_disprove) + " to disprove it."}
             </DialogTitle>
             <DialogContent dividers>
               <DialogContentText>

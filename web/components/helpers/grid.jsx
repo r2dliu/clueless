@@ -7,6 +7,7 @@ import {
 import getToken from "@/components/helpers/token";
 import styles from "@/components/Canvas/Board/Board.module.scss";
 import { GameContext } from "@/components/helpers/GameContext";
+import Suggestion from "../Canvas/Suggestion/Suggestion";
 
 /* This function takes in current suspect locations (dict) and places character tokens on the board
     If not occupied: render image at location i with image i
@@ -456,6 +457,9 @@ export default function BoardGrid() {
             </Grid>
 
 
+            {gameState.is_active_suggestion && (
+                <Suggestion/>
+            )}
         </Grid >
     );
 }

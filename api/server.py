@@ -111,10 +111,10 @@ async def websocket_connection(websocket: WebSocket, game_uuid: str,
                         # Validate turn order
                         if (message["current_turn"] == clientSuspect):
                             # Handle suggestion 
-                            game.initiate_suggestion(clientSuspect, data["suggestion"])
-                            validCards = game.getValidcards(data["next_to_disprove"], data["suggestion"])
-                            await connection_manager.broadcast(
-                                json.dumps({"type": "validCards", "cards":  json.dumps(validCards)}), websocket)
+                            nextToDisprove = game.initiate_suggestion(clientSuspect, data["suggestion"])
+                            validCards = game.getValidcards(nextToDisprove, data["suggestion"])
+                            # await connection_manager.broadcast(
+                            #     json.dumps({"type": "validCards", "cards":  json.dumps(validCards)}), websocket)
                         else:
                             await connection_manager.send_personal_message(
                                 json.dumps({"type": "turn_error"}), websocket)

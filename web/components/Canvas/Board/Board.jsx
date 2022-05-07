@@ -47,7 +47,7 @@ function Board(props) {
   useEffect(() => {
     if (websocket.current) {
       websocket.current.addEventListener("message", (message) => {
-        console.log(message);
+        // console.log(message);
         const new_state = JSON.parse(message?.data);
         console.log(new_state);
         if (!new_state.type) {
@@ -154,14 +154,7 @@ function Board(props) {
         gameState.game_phase === 3 && (
           <div>Game Over! Nobody wins!</div>
         )
-      }
-
-      {gameState.game_phase === 4 && (
-        <Suggestion 
-          currentTurn = {formatLabel(gameState.current_turn)}
-        />
-      )}
-      
+      } 
       <Cards />
     </div >
   );
