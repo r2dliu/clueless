@@ -119,7 +119,13 @@ function Controls(props) {
                                 }}
                                 disabled={isControlsLocked
                                     || currentRoom.includes('start') //cant make suggestion on turn one
-                                    || !rooms.includes(currentRoom)} //cant make suggestion if not in a room
+                                    || !rooms.includes(currentRoom) //cant make suggestion if not in a room
+
+                                    // Also disabled if player was not moved there by a suggestion and
+                                    // they haven't made a move yet
+                                    || (gameState.moved_by_suggestion[clientSuspect] == false
+                                    && gameState.has_moved_yet[clientSuspect] == false)
+                                } 
                                 size="large"
                             >
                                 Make Suggestion
@@ -152,7 +158,6 @@ function Controls(props) {
                                 onClick={() => {
                                     openRulesDialog();
                                 }}
-                                disabled={isControlsLocked}
                                 size="large"
                             >
                                 See Rules
@@ -177,6 +182,7 @@ function Controls(props) {
                                         location: move,
                                     })
                                 );
+                                // clear the action so the controls go away
                                 setAction("");
                             }}
                             disabled={isControlsLocked}
@@ -295,6 +301,8 @@ function Controls(props) {
                                 else {
                                     validateSuggestionFields();
                                 }
+                                // clear the action so the controls go away
+                                setAction("");
                             }}
                             disabled={isControlsLocked}
                         >
@@ -413,6 +421,8 @@ function Controls(props) {
                                 } else {
                                     validateAccusationFields()
                                 }
+                                // clear the action so the controls go away
+                                setAction("");
                             }}
                             disabled={isControlsLocked}
                         >

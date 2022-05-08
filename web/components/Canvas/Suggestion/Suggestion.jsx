@@ -16,7 +16,7 @@ function Suggestion(props) {
   const [gameState, setGameState] = gameStateContext;
 
   const player = gameState?.assignments[clientId] || "";
-  const playersCards = gameState?.cards_to_display[player] || [];
+  const playersCards = gameState?.suggestion_valid_cards || [];
   const suggestionCards = [gameState?.suggestion?.room, gameState?.suggestion?.suspect, gameState?.suggestion?.weapon];
 
   const suggestor = formatLabel(gameState?.suggestion_starter);
@@ -92,7 +92,6 @@ function Suggestion(props) {
               <Cards cards={playersCards}
                      isClickable={true}
                      onClick={selectCard}
-                     validCards={gameState?.suggestion_valid_cards}
               />
 
             </DialogContent>
