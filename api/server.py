@@ -141,7 +141,7 @@ async def websocket_connection(websocket: WebSocket, game_uuid: str,
                         #         json.dumps({"type": "full_circle"}), websocket)
 
                     # End suggestion
-                    elif (data["type"] == "end_suggestion"):
+                    elif (data["type"] == "terminate_suggestion"):
                         game.terminate_suggestion()
 
                     # End turn

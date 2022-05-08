@@ -49,7 +49,6 @@ function CharSelect() {
         newAssignments[`${gameState?.assignments[player]}`] = player;
       }
       setAssignments(newAssignments);
-      console.log(newAssignments);
     }
 
   }, [gameState]);
@@ -72,7 +71,7 @@ function CharSelect() {
                   })
                 );
               }}
-              disabled={assignments[suspect]}
+              disabled={assignments[suspect] != undefined}
             >
               <SuspectImage name={suspect}></SuspectImage>
 

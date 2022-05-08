@@ -22,10 +22,6 @@ function Suggestion(props) {
   const suggestor = formatLabel(gameState?.suggestion_starter);
   const nextToDisprove = gameState?.next_to_disprove;
 
-  const [suggestionDialogOpen,setSuggestionDialogOpen] = useState(false);
-  const openSuggestionDialog = () => setSuggestionDialogOpen(true);
-  const closeSuggestionDialog = () => setSuggestionDialogOpen(false);
-
   const passSuggestion = () => {
     websocket?.current?.send(
       JSON.stringify({
@@ -44,13 +40,13 @@ function Suggestion(props) {
     );
   };
 
-  // const clearSuggestion= () => {
-  //   websocket?.current?.send(
-  //     JSON.stringify({
-  //       type: "clear_suggestion",
-  //     })
-  //   );
-  // };
+  const clearSuggestion= () => {
+    websocket?.current?.send(
+      JSON.stringify({
+        type: "terminate_suggestion",
+      })
+    );
+  };
 
   // useEffect(() => {
   //   if (gameState.is_active_suggestion && !suggestionDialogOpen) {
@@ -64,11 +60,10 @@ function Suggestion(props) {
         /* open has to change to something along the lines of gameState.is_active_suggestion && gameState.suggestion_starter == "" 
            to get the end suggestion states to show. You will also need to clear the remaining state (suggestion_stater, disproval card) to reset */ 
         open={gameState.is_active_suggestion}
-        onClose={!gameState.is_active_suggestion}
       >
 
         {/* it's your turn to disprove */}
-        {player == nextToDisprove && (
+        {player == nextToDisprove && !gameState?.suggestion_end_state && (
           <div>
             <DialogTitle>
             {`${suggestor} made a suggestion. It's currently your turn to disprove it.`}
@@ -113,7 +108,7 @@ function Suggestion(props) {
         )}
 
         {/* it's someone else's turn */}
-        {player != nextToDisprove && (
+        {player != nextToDisprove && !gameState?.suggestion_end_state && (
           <div>
             <DialogTitle>
             {`${suggestor} made a suggestion. It's currently ${formatLabel(nextToDisprove)}'s to disprove it.`}
@@ -129,10 +124,10 @@ function Suggestion(props) {
         )}
 
         {/* suggestor - disproven */}
-        {player == gameState?.suggestion_starter && !gameState?.is_active_suggestion && gameState?.suggestion_disproval_card && (
+        {player == gameState?.suggestion_starter && gameState?.suggestion_end_state && gameState?.suggestion_disproval_card && (
           <div>
             <DialogTitle>
-              {`${gameState.next_to_disprove} disproved your suggestion with the ${gameState.suggestion_disproval_card}`}
+              {`${formatLabel(gameState.next_to_disprove)} disproved your suggestion with the ${formatLabel(gameState.suggestion_disproval_card)}.`}
             </DialogTitle>
             <DialogContent>
               <div className={styles.disprovalCard}>
@@ -140,19 +135,16 @@ function Suggestion(props) {
               </div>
             </DialogContent>
             <DialogActions>
-            <Button onClick={() => {
-                      closeSuggestionDialog();
-                      // clearSuggestion();
-                    }}
+            <Button onClick={() => {clearSuggestion()}}
                     variant="contained">
-                        Continue
+                      Continue
               </Button>
             </DialogActions>
           </div>
         )}
 
         {/* suggestor - all passed */}
-        {player == gameState?.suggestion_starter && !gameState?.is_active_suggestion &&  gameState?.suggestion_all_passed && (
+        {player == gameState?.suggestion_starter && gameState?.suggestion_end_state &&  gameState?.suggestion_all_passed && (
           <div>
             <DialogTitle>
               {`Everyone passed your suggestion.`}
@@ -170,14 +162,20 @@ function Suggestion(props) {
               </div>
             </DialogContent>
             <DialogActions>
-              <Button onClick={() => {
-                        closeSuggestionDialog();
-                        // clearSuggestion();
-                      }}
+              <Button onClick={() => {clearSuggestion()}}
                       variant="contained">
                         Continue
               </Button>
             </DialogActions>
+          </div>
+        )}
+
+        {/* non-suggestor - they need to wait for the suggestor to ack the suggestion unfortunatley */}
+        {player != gameState?.suggestion_starter && gameState?.suggestion_end_state && (
+          <div>
+            <DialogTitle>
+              {`${formatLabel(suggestor)}'s suggestion has been resolved. The case will continue shortley.`}
+            </DialogTitle>
           </div>
         )}
 

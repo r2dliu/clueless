@@ -49,7 +49,6 @@ function Board(props) {
       websocket.current.addEventListener("message", (message) => {
         // console.log(message);
         const new_state = JSON.parse(message?.data);
-        console.log(new_state);
         if (!new_state.type) {
           console.log(new_state);
           return;
