@@ -99,6 +99,7 @@ class Clueless:
             "suggestion_disproval_card": '', # the card that disproved the suggestion
             "suggestion_valid_cards": [], # valid cards to disprove current suggestion
             "suggestion_all_passed": False, # everyone passed the suggestion
+            "suggestion_end_state": False, # show suggestion end state
             "is_active_suggestion": False,
             "next_to_disprove": '', # next suspect to disprove suggestion
             "current_turn": "miss_scarlet",  # player token
@@ -409,7 +410,7 @@ class Clueless:
         # suggestion was disproven, advance the game
         if(card != "none"):
             self.state["suggestion_disproval_card"] = card
-            self.terminate_suggestion()
+            self.suggestion_end_state()
             # current player's turn is over, move turns
             self.rotate_next_player(self.state["current_turn"], False)
         # player passed
@@ -419,14 +420,25 @@ class Clueless:
 
             # handle full circle
             if(nextPlayerToDisprove == self.state["suggestion_starter"]):
-                self.terminate_suggestion()
+                self.suggestion_end_state()
                 self.state["suggestion_all_passed"] = True
 
     def terminate_suggestion(self):
+        # clear all suggestion state
         self.state["suggestion"] = {}
         self.state["is_active_suggestion"] = False
+        self.state["suggestion_end_state"] = False
+        self.state["suggestion_disproval_card"] = ''
+        self.state["suggestion_valid_cards"] = []
+        self.state["suggestion_order"] = []
+        self.state["suggestion_all_passed"] = False,
+
+        # rotate the turn before clearing the suggestion starter
         self.rotate_next_player(self.state["suggestion_starter"], False)
-        return 
+        self.state["suggestion_starter"] = ''
+
+    def suggestion_end_state(self):
+        self.state["suggestion_end_state"] = True
 
     def next_to_disprove(self, player: str) -> str:
         """ Updates game state with next character up to disprove suggestion """

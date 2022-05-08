@@ -6,6 +6,7 @@ import {
 import getToken from "@/components/helpers/token";
 import { GameContext } from "@/components/helpers/GameContext";
 import styles from "./BoardGrid.module.scss";
+import Suggestion from "../../Suggestion/Suggestion";
 
 
 
@@ -134,6 +135,10 @@ function BoardGrid() {
         ))}
 
       </Grid>
+
+      {gameState.is_active_suggestion && (
+                <Suggestion/>
+      )}
     </div >
   );
 }
