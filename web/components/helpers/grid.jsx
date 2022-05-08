@@ -456,10 +456,6 @@ export default function BoardGrid() {
                 ></div>
             </Grid>
 
-
-            {gameState.is_active_suggestion && (
-                <Suggestion/>
-            )}
         </Grid >
     );
 }
