@@ -27,10 +27,13 @@ function Cards(props) {
     gameState.game_phase === 1 && (
       <div className={styles.Cards}>
         {cards.map((name) => (
-          <CardActionArea 
-            onClick={() => {props?.onClick(name)}}
-            key={name}
-          >
+          <CardActionArea disabled={!props?.isClickable}
+            onClick={() => {
+              if(props?.isClickable) {
+                props?.onClick(name)
+              }
+            }}
+            key={name}>
             <Card key={name} name={name} />
           </CardActionArea>
         ))}

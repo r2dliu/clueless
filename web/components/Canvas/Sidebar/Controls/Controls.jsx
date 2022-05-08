@@ -183,6 +183,7 @@ function Controls(props) {
                                         location: move,
                                     })
                                 );
+                                // clear the action so the controls go away
                                 setAction("");
                             }}
                             disabled={isControlsLocked}
@@ -301,6 +302,8 @@ function Controls(props) {
                                 else {
                                     validateSuggestionFields();
                                 }
+                                // clear the action so the controls go away
+                                setAction("");
                             }}
                             disabled={isControlsLocked}
                         >
@@ -419,6 +422,8 @@ function Controls(props) {
                                 } else {
                                     validateAccusationFields()
                                 }
+                                // clear the action so the controls go away
+                                setAction("");
                             }}
                             disabled={isControlsLocked}
                         >
