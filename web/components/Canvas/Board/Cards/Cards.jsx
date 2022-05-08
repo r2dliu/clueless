@@ -27,13 +27,10 @@ function Cards(props) {
     gameState.game_phase === 1 && (
       <div className={styles.Cards}>
         {cards.map((name) => (
-          <CardActionArea disabled={!props?.isClickable && !gameState?.suggestion_valid_cards?.includes(name)}
-                          onClick={() => {
-                            if(props?.isClickable && gameState?.suggestion_valid_cards?.includes(name)) {
-                              props?.onClick(name)
-                            }
-                          }}
-                          key={name}>
+          <CardActionArea 
+            onClick={() => {props?.onClick(name)}}
+            key={name}
+          >
             <Card key={name} name={name} />
           </CardActionArea>
         ))}

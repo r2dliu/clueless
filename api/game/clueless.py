@@ -86,17 +86,19 @@ class Clueless:
             "game_phase":
             GamePhase.NOT_STARTED.value,  # determines what view players see
             "suspect_locations": {},  # dict of suspect: room/hallway loc
+            "moved_by_suggestion": {}, # dict of {player: bool}
+            "has_moved_yet": {}, # dict of {player: bool}
             "concealed_scenario": {},
             "player_cards": {},  # dict of player: player's card list
             "visible_cards": [],  # list of cards shown to all players
             "selectable_cards": {},  # cards that players can suggest/accuse
             "turn_order": [],  # player turn order
             "suggestion": {},  # holds current suggestion players must disprove
-            "suggestion_starter": '',
+            "suggestion_starter": '', # player who made the suggestion
             "suggestion_order": [], # suggestion order
             "suggestion_disproval_card": '', # the card that disproved the suggestion
             "suggestion_valid_cards": [], # valid cards to disprove current suggestion
-            "is_active_suggestion": False,
+            "is_active_suggestion": False, # shows suggestion dialog to players
             "next_to_disprove": '', # next suspect to disprove suggestion
             "current_turn": "miss_scarlet",  # player token
             "winner": {},  # holds the winner of the game
@@ -181,6 +183,12 @@ class Clueless:
         # starting locations
         self.state["suspect_locations"] = dict(
             zip(self.first_moves.keys(), self.starting_locations))
+
+        # fill out "moved by suggestion" and "has moved yet"; initialize all players to False
+        # this is needed for the special condition where a player is moved by a suggestion.
+        # we only need to keep track of the player's tokens, non-players don't matter
+        self.state["moved_by_suggestion"] = dict.fromkeys(self.players, False)
+        self.state["has_moved_yet"] = dict.fromkeys(self.players, False)
 
         # randomly generated case file cards
         self.state["concealed_scenario"] = self.create_scenario()
@@ -330,6 +338,12 @@ class Clueless:
             self.state[
                 "previous_move"] = player + " made an incorrect accusation! They are out of the game!"
 
+        # reset the "moved by suggestion" flags to False so 
+        # player can't stay & suggest in the room they were
+        # moved to more than once
+        self.state["moved_by_suggestion"][player] = False
+        self.state["has_moved_yet"][player] = False
+        
         self.state["current_turn"] = self.get_next_player(player)
         return self.state["current_turn"]
 
@@ -359,6 +373,7 @@ class Clueless:
         if location in self.allowed_moves(player):
             self.state["previous_move"] = player + " moved to " + location
             self.state["suspect_locations"][player] = location
+            self.state["has_moved_yet"][player] = True
             #self.rotate_next_player(player)
         # else:
         # todo return error?
@@ -368,10 +383,16 @@ class Clueless:
         self.state["suggestion_disproval_card"] = ''
         self.state["is_active_suggestion"] = True
         self.state["suggestion"] = suggestion
+
+        # move the suspected player to the suspected room
+        self.state["suspect_locations"][suggestion["suspect"]] = suggestion["room"]
+        if (suggestion["suspect"] in self.players):
+            self.state["moved_by_suggestion"][suggestion["suspect"]] = True
+
         nextPlayerToDisprove = self.next_to_disprove(player)
         self.state["suggestion_valid_cards"] = self.get_valid_cards(nextPlayerToDisprove, suggestion)
 
-        
+
     def get_valid_cards(self, player: str, suggestion: dict) -> List:
         playersCards = set(self.state['player_cards'][player])
 
@@ -399,7 +420,7 @@ class Clueless:
     def terminate_suggestion(self):
         self.state["suggestion"] = {}
         self.state["is_active_suggestion"] = False
-        return 
+        return
 
     def next_to_disprove(self, player: str) -> str:
         """ Updates game state with next character up to disprove suggestion """

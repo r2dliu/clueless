@@ -4,9 +4,10 @@
   .card {
     position: relative;
     width: 100px;
-    margin-left: -50px;
+    margin-left: 0px;
     overflow-x: hidden;
     border: 1px solid black;
+
     &:hover {
       transform: scale(1.2);
       z-index: 10;
