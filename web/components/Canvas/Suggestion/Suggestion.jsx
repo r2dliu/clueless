@@ -130,7 +130,8 @@ function Suggestion(props) {
             </DialogTitle>
             <DialogContent>
               <div className={styles.disprovalCard}>
-                <CardMedia component={"img"} src={`/static/board/${gameState.suggestion_disproval_card}.jpg`} />
+                <Cards cards={[gameState.suggestion_disproval_card]}/>
+                {/* <CardMedia component={"img"} src={`/static/board/${gameState.suggestion_disproval_card}.jpg`} /> */}
               </div>
             </DialogContent>
             <DialogActions>
@@ -155,9 +156,10 @@ function Suggestion(props) {
                 </Typography>
               </DialogContentText>
               <div className={styles.disprovalCard}>
-                <CardMedia component={"img"} src={`/static/board/${gameState.suggestion.suspect}.jpg`} />
+                <Cards cards={[gameState.suggestion.suspect, gameState.suggestion.weapon, gameState.suggestion.room]}/>
+                {/* <CardMedia component={"img"} src={`/static/board/${gameState.suggestion.suspect}.jpg`} />
                 <CardMedia component={"img"} src={`/static/board/${gameState.suggestion.weapon}.jpg`} />
-                <CardMedia component={"img"} src={`/static/board/${gameState.suggestion.room}.jpg`} />
+                <CardMedia component={"img"} src={`/static/board/${gameState.suggestion.room}.jpg`} /> */}
               </div>
             </DialogContent>
             <DialogActions>

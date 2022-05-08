@@ -430,9 +430,7 @@ class Clueless:
         self.state["suggestion_end_state"] = False
         self.state["suggestion_disproval_card"] = ''
         self.state["suggestion_valid_cards"] = []
-        self.state["suggestion_order"] = []
         self.state["suggestion_all_passed"] = False,
-
         # rotate the turn before clearing the suggestion starter
         self.rotate_next_player(self.state["suggestion_starter"], False)
         self.state["suggestion_starter"] = ''
