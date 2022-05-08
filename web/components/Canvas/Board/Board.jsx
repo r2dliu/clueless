@@ -7,6 +7,7 @@ import formatLabel from "@/components/helpers/utils";
 import getToken from "@/components/helpers/token";
 import { GameContext } from "@/components/helpers/GameContext";
 import styles from "./Board.module.scss";
+import Suggestion from "../Suggestion/Suggestion";
 import Rules from "../Rules/Rules";
 
 import BoardGrid from "./BoardGrid";
@@ -46,7 +47,7 @@ function Board(props) {
   useEffect(() => {
     if (websocket.current) {
       websocket.current.addEventListener("message", (message) => {
-        console.log(message);
+        // console.log(message);
         const new_state = JSON.parse(message?.data);
         console.log(new_state);
         if (!new_state.type) {
@@ -122,6 +123,7 @@ function Board(props) {
       }
 
       {/* display current turn text and token */}
+
       {
         gameState.game_phase === 1 && (
           <b>It is {formatLabel(gameState.current_turn)}&apos;s turn</b>
@@ -146,8 +148,7 @@ function Board(props) {
         gameState.game_phase === 3 && (
           <div>Game Over! Nobody wins!</div>
         )
-      }
-
+      } 
       <Cards />
     </div >
   );

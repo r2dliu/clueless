@@ -59,8 +59,7 @@ function CharSelect() {
     gameState.game_phase === 0 && (
       <div className={styles.CharSelect}>
         {suspects.map((suspect) => (
-          <Card sx={{
-          }}>
+          <Card key={suspect} sx={{}}>
             <ButtonBase
               key={`suspect-${suspect}`}
               variant="outlined"

@@ -11,8 +11,6 @@ class GamePhase(Enum):
     IN_PROGRESS = 1
     COMPLETED = 2
     ENDED = 3  # Everyone failed their accusations
-    SUGGESTION = 4  # suggestion initated
-
 
 class Clueless:
     # TODO suggestion logic, available movement options
@@ -93,11 +91,15 @@ class Clueless:
             "visible_cards": [],  # list of cards shown to all players
             "selectable_cards": {},  # cards that players can suggest/accuse
             "turn_order": [],  # player turn order
-            "suggestion_starter": '',
-            "suggestion_order": [],  # suggestion order
-            "next_to_disprove": '',  # next suspect to disprove suggestion
-            "current_turn": "miss_scarlet",  # player token
             "suggestion": {},  # holds current suggestion players must disprove
+            "suggestion_starter": '',
+            "suggestion_order": [], # suggestion order
+            "suggestion_disproval_card": '', # the card that disproved the suggestion
+            "suggestion_valid_cards": [], # valid cards to disprove current suggestion
+            "suggestion_all_passed": False, # everyone passed the suggestion
+            "is_active_suggestion": False,
+            "next_to_disprove": '', # next suspect to disprove suggestion
+            "current_turn": "miss_scarlet",  # player token
             "winner": {},  # holds the winner of the game
             "previous_move": {},  # holds the previous move for minimal demo
         }
@@ -362,16 +364,49 @@ class Clueless:
         # else:
         # todo return error?
 
-    def initiate_suggestion(self, player: str, suggestion: dict) -> Dict:
+    def initiate_suggestion(self, player: str, suggestion: dict):
         self.state["suggestion_starter"] = player
-        self.state["game_phase"] = GamePhase.SUGGESTION.value
+        self.state["suggestion_disproval_card"] = ''
+        self.state["is_active_suggestion"] = True
         self.state["suggestion"] = suggestion
-        self.next_to_disprove(player)
-        return
+        self.state["suspect_locations"][suggestion["suspect"]] = suggestion["room"]
+        nextPlayerToDisprove = self.next_to_disprove(player)
+        self.state["suggestion_valid_cards"] = self.get_valid_cards(nextPlayerToDisprove, suggestion)
+
+        
+    def get_valid_cards(self, player: str, suggestion: dict) -> List:
+        playersCards = set(self.state['player_cards'][player])
+
+        suggestionCards = set(suggestion.values())
+        overlap = playersCards.intersection(suggestionCards)
+        return list(overlap)
+
+    def disprove_suggestion(self, player, card) -> Dict:
+        # TODO validate answer - tbh we probably don't need to worry about this for the project
+        # if(card != "none" and card not in self.get_valid_cards(player)):
+        #     print("cheater cheater pumpkin eater, you lose")
+
+        # suggestion was disproven, advance the game
+        if(card != "none"):
+            self.state["suggestion_disproval_card"] = card
+            self.terminate_suggestion()
+            # current player's turn is over, move turns
+            self.rotate_next_player(self.state["current_turn"], False)
+        # player passed
+        else:            
+            nextPlayerToDisprove = self.next_to_disprove(player)
+            self.state["suggestion_valid_cards"] = self.get_valid_cards(nextPlayerToDisprove, self.state["suggestion"])
+
+            # handle full circle
+            if(nextPlayerToDisprove == self.state["suggestion_starter"]):
+                self.terminate_suggestion()
+                self.state["suggestion_all_passed"] = True
 
     def terminate_suggestion(self):
-        self.state["suggestion_starter"] = ''
-        return
+        self.state["suggestion"] = {}
+        self.state["is_active_suggestion"] = False
+        self.rotate_next_player(self.state["suggestion_starter"], False)
+        return 
 
     def next_to_disprove(self, player: str) -> str:
         """ Updates game state with next character up to disprove suggestion """
@@ -385,4 +420,4 @@ class Clueless:
 
         self.state['next_to_disprove'] = next_player
 
-        return self.state['next_to_disprove']
+        return next_player

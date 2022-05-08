@@ -74,7 +74,7 @@ function Tile({ sus_locs, tile_name }) {
 
       <CardMedia component={"img"} src={`/static/tiles/${tile_name}.jpg`} />
       {suspects_on_tile.map((sus) => (
-        <Token sus={sus} tile_name={tile_name} />
+        <Token sus={sus} tile_name={tile_name} key={sus} />
       ))}
     </Grid >
 
@@ -130,7 +130,7 @@ function BoardGrid() {
         width={'75%'}>
 
         {tiles.map((tile) => (
-          <Tile sus_locs={suspectLocs} tile_name={tile}></Tile>
+          <Tile sus_locs={suspectLocs} tile_name={tile} key={tile}></Tile>
         ))}
 
       </Grid>

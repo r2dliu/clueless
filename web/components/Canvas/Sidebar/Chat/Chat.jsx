@@ -90,7 +90,7 @@ function Chat() {
             {history.map((action) => (
               // Chip is too big to fit in the chatbox :(
               //<Chip label={action} variant="outlined" key={action} />
-              <p>{action}</p>
+              <p key={action}>{action}</p>
             ))}
           </div>
         </div>
