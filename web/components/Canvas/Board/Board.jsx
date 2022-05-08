@@ -10,7 +10,7 @@ import styles from "./Board.module.scss";
 import Suggestion from "../Suggestion/Suggestion";
 import Rules from "../Rules/Rules";
 
-import BoardGrid from "@/components/helpers/grid";
+import BoardGrid from "./BoardGrid";
 import Cards from "./Cards";
 import CharSelect from "./CharSelect";
 
@@ -117,14 +117,8 @@ function Board(props) {
       {/* display board */}
       {gameState.game_phase === 1 && (
 
-        <div style={{
-          position: 'relative',
-          bottom: 0,
-          justifyContent: 'center',
-          left: 120, // TODO: center the board properly
-        }} >
-          < BoardGrid />
-        </div>
+        < BoardGrid />
+
       )
       }
 

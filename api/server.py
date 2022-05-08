@@ -120,6 +120,9 @@ async def websocket_connection(websocket: WebSocket, game_uuid: str,
                     elif (data["type"] == "disprove_suggestion"):
                         game.disprove_suggestion(clientSuspect, data["card"])
 
+                    elif (data["type"] == "clear_suggestion"):
+                        game.clear_suggestion()
+
                     # Suggestion cycle
                     # front end caller should update suggestion_actor as cycle continues
                     # break when full circle msg is sent
@@ -131,11 +134,11 @@ async def websocket_connection(websocket: WebSocket, game_uuid: str,
                         await connection_manager.send_personal_message(
                                 json.dumps({"type": "validCards", "cards":  json.dumps(validCards)}), websocket)
 
-                        next_up = game.next_to_disprove(data["suggestion_actor"])
+                        # next_up = game.next_to_disprove(data["suggestion_actor"])
                         # has every player attempted to disprove?
-                        if next_up == message["suggestion_starter"]:
-                            await connection_manager.send_personal_message(
-                                json.dumps({"type": "full_circle"}), websocket)
+                        # if next_up == message["suggestion_starter"]:
+                        #     await connection_manager.send_personal_message(
+                        #         json.dumps({"type": "full_circle"}), websocket)
 
                     # End suggestion
                     elif (data["type"] == "end_suggestion"):
