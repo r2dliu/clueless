@@ -158,7 +158,6 @@ function Controls(props) {
                                 onClick={() => {
                                     openRulesDialog();
                                 }}
-                                disabled={isControlsLocked}
                                 size="large"
                             >
                                 See Rules
